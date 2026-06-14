@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation (mobile & desktop)</title>
+    <title>Live Social - Simulation Pro (mobile & desktop)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -19,7 +19,6 @@
             overflow: hidden;
             touch-action: pan-y;
         }
-        /* Style pour s'assurer que le conteneur prend tout l'écran en mode Fullscreen */
         .live-container {
             display: flex;
             flex-direction: column;
@@ -28,12 +27,13 @@
             max-width: 1400px;
             margin: 0 auto;
             background: #000;
+            position: relative;
         }
         .video-area {
             position: relative;
             background: #111;
             flex: 2;
-            min-height: 45vh;
+            min-height: 48vh;
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
         }
@@ -49,7 +49,7 @@
             left: 0;
             right: 0;
             padding: 16px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -70,16 +70,16 @@
             pointer-events: auto;
         }
         .live-badge i {
-            font-size: 12px;
+            font-size: 10px;
             animation: pulse 1.2s infinite;
         }
         @keyframes pulse {
-            0% { opacity: 0.4; transform: scale(0.9);}
-            100% { opacity: 1; transform: scale(1.2);}
+            0% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.2); }
         }
         .stats-header {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             background: rgba(0,0,0,0.5);
             backdrop-filter: blur(8px);
             padding: 6px 14px;
@@ -101,11 +101,11 @@
             backdrop-filter: blur(12px);
             border: none;
             color: white;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             padding: 12px;
             border-radius: 50%;
-            width: 52px;
-            height: 52px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -115,9 +115,8 @@
             pointer-events: auto;
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
-        .camera-switch-btn:active {
-            transform: scale(0.94);
-        }
+        .camera-switch-btn:active { transform: scale(0.94); }
+        
         .interaction-area {
             background: #0f0f0f;
             flex: 1.2;
@@ -125,12 +124,13 @@
             flex-direction: column;
             border-top: 1px solid #2a2a2a;
             box-shadow: 0 -4px 12px rgba(0,0,0,0.4);
+            position: relative;
         }
         .reaction-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 18px;
+            padding: 12px 16px;
             background: #161616;
             border-bottom: 1px solid #2c2c2c;
         }
@@ -139,68 +139,117 @@
             padding: 8px 16px;
             border-radius: 50px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .like-count i {
-            color: #ff2d55;
-            font-size: 1.2rem;
-        }
+        .like-count i { color: #ff2d55; }
+        
         .btn-like {
             background: linear-gradient(135deg, #ff2d55, #ff4757);
             border: none;
             color: white;
-            padding: 10px 24px;
+            padding: 10px 22px;
             border-radius: 40px;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: 0.2s;
             box-shadow: 0 2px 8px rgba(255,45,85,0.3);
+            position: relative;
         }
-        .btn-like:active {
-            transform: scale(0.96);
-        }
+        .btn-like:active { transform: scale(0.96); }
+        
+        /* Fenêtre de tchat */
         .chat-window {
             flex: 1;
             overflow-y: auto;
             padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             scroll-behavior: smooth;
             background: #0a0a0a;
         }
         .message-item {
-            background: rgba(30,30,40,0.7);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(26, 26, 36, 0.5);
             backdrop-filter: blur(4px);
-            border-radius: 24px;
-            padding: 8px 14px;
-            max-width: 90%;
+            border-radius: 18px;
+            padding: 8px 12px;
+            max-width: 95%;
             font-size: 0.85rem;
-            animation: fadeSlideUp 0.2s ease;
-            border-left: 3px solid #ff3b30;
+            animation: fadeSlideUp 0.22s cubic-bezier(0.1, 0.8, 0.2, 1);
             word-break: break-word;
+            border-left: 3px solid #3a3a4a;
         }
-        .message-item strong {
+        .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+            color: white;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .msg-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .username-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
             color: #ff9f4a;
-            margin-right: 6px;
         }
+        .badge-verified {
+            color: #3897f0;
+            font-size: 0.75rem;
+        }
+        .msg-text {
+            color: #efefef;
+            line-height: 1.3;
+        }
+        
+        /* Messages système & d'arrivées */
         .system-message {
-            background: rgba(255,75,45,0.15);
-            border-left-color: #ff9f4a;
-            font-style: italic;
+            background: rgba(255, 75, 45, 0.1);
+            border-left-color: #ff453a;
         }
+        .system-message .username-wrapper { color: #ff453a; }
+        
+        .join-message {
+            background: transparent;
+            border-left: none;
+            padding: 2px 12px;
+            font-style: italic;
+            color: #8e8e93;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .join-message i { font-size: 0.7rem; color: #34c759; }
+
         .my-message {
-            background: #2c2c3a;
+            background: rgba(42, 157, 143, 0.15);
             align-self: flex-end;
             border-left-color: #2a9d8f;
         }
+        .my-message .username-wrapper { color: #2a9d8f; }
+        
         .chat-input-area {
             display: flex;
             padding: 10px 14px;
@@ -222,48 +271,63 @@
             background: #ff3b30;
             border: none;
             color: white;
-            width: 46px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .heart-animation {
-            position: fixed;
-            bottom: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2.5rem;
+        
+        /* Conteneur des cœurs flottants à la TikTok */
+        .heart-stream-container {
+            position: absolute;
+            right: 20px;
+            bottom: 60px;
+            width: 100px;
+            height: 320px;
             pointer-events: none;
-            z-index: 200;
-            animation: floatUp 1s ease-out forwards;
-            color: #ff2d55;
-            text-shadow: 0 0 6px rgba(255,0,0,0.5);
+            z-index: 99;
+            overflow: hidden;
         }
-        @keyframes floatUp {
+        .floating-heart {
+            position: absolute;
+            bottom: 0;
+            right: 25px;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: floatUpStream 2.2s cubic-bezier(0.08, 0.74, 0.31, 1) forwards;
+        }
+        @keyframes floatUpStream {
             0% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(0.8);
+                opacity: 0;
+                transform: bottom 0px scale(0.5) translateX(0);
+            }
+            12% {
+                opacity: 0.95;
+                transform: scale(1.1);
+            }
+            85% {
+                opacity: 0.8;
             }
             100% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(-100px) scale(1.5);
+                bottom: 280px;
+                transform: scale(1.4) translateX(var(--x-end));
             }
         }
         @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(12px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .chat-window::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chat-window::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-        .chat-window::-webkit-scrollbar-thumb {
-            background: #ff3b30;
-            border-radius: 10px;
-        }
+        
+        .chat-window::-webkit-scrollbar { width: 4px; }
+        .chat-window::-webkit-scrollbar-thumb { background: #ff3b30; border-radius: 10px; }
+
         .retry-camera {
             position: absolute;
             bottom: 80px;
@@ -277,16 +341,12 @@
             font-weight: bold;
             cursor: pointer;
             z-index: 15;
-            pointer-events: auto;
             box-shadow: 0 2px 10px black;
         }
-        /* Style de l'overlay de démarrage obligatoire */
+        
         .start-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: #0d0d11;
             z-index: 999;
             display: flex;
@@ -297,19 +357,8 @@
             padding: 20px;
             transition: opacity 0.4s ease;
         }
-        .start-overlay h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            color: #fff;
-        }
-        .start-overlay p {
-            font-size: 0.85rem;
-            color: #aaa;
-            text-align: center;
-            max-width: 290px;
-            line-height: 1.4;
-        }
+        .start-overlay h2 { font-size: 1.5rem; font-weight: 700; text-align: center; }
+        .start-overlay p { font-size: 0.85rem; color: #aaa; text-align: center; max-width: 290px; line-height: 1.4; }
         .start-btn {
             background: linear-gradient(135deg, #ff3b30, #ff453a);
             color: white;
@@ -320,73 +369,61 @@
             font-size: 1.05rem;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: transform 0.1s;
-        }
-        .start-btn:active {
-            transform: scale(0.96);
         }
         @media (max-width: 700px) {
-            .video-area { min-height: 40vh; }
-            .stats-header span { font-size: 0.7rem; }
-            .btn-like { padding: 8px 18px; }
-            .camera-switch-btn {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-                bottom: 12px;
-                right: 12px;
-            }
+            .video-area { min-height: 42vh; }
+            .camera-switch-btn { width: 44px; height: 44px; bottom: 12px; right: 12px; font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="start-overlay" id="appStartOverlay">
-    <h2>Simulation de Live Video</h2>
-    <p>Pour activer le mode plein écran natif et configurer votre flux vidéo, veuillez cliquer sur le bouton.</p>
+    <h2>Simulation Intelligente Live</h2>
+    <p>Accédez à l'expérience plein écran ultra-réaliste avec interactions de foule synchronisées et gestion vidéo avancée.</p>
     <button class="start-btn" id="explicitStartBtn">
-        <i class="fas fa-expand"></i> Lancer le Live
+        <i class="fas fa-expand"></i> Démarrer la Simulation
     </button>
 </div>
 
-<div class="live-container" id="mainAppContainer">
+<div class="live-container">
     <div class="video-area">
         <video id="liveVideo" autoplay playsinline muted></video>
         <div class="video-overlay">
-            <div class="live-badge">
-                <i class="fas fa-circle"></i> EN DIRECT
-            </div>
+            <div class="live-badge"><i class="fas fa-circle"></i> EN DIRECT</div>
             <div class="stats-header">
                 <span><i class="fas fa-eye"></i> <span id="viewerCount">187</span></span>
                 <span><i class="fas fa-heart"></i> <span id="likeCountDisplay">342</span></span>
             </div>
         </div>
-        <button id="switchCameraBtn" class="camera-switch-btn" title="Basculer caméra avant/arrière">
-            <i class="fas fa-camera-retro"></i>
-        </button>
+        <button id="switchCameraBtn" class="camera-switch-btn"><i class="fas fa-camera-retro"></i></button>
     </div>
 
     <div class="interaction-area">
+        <div class="heart-stream-container" id="heartStream"></div>
+
         <div class="reaction-toolbar">
             <div class="like-count">
                 <i class="fas fa-heart"></i> <span id="totalLikesRealtime">342</span> likes
             </div>
-            <button id="sendLikeBtn" class="btn-like">
-                <i class="fas fa-heart"></i> J'aime
-            </button>
+            <button id="sendLikeBtn" class="btn-like"><i class="fas fa-heart"></i> J'aime</button>
         </div>
 
         <div class="chat-window" id="chatMessages">
             <div class="message-item system-message">
-                <strong>🤖 Live Social</strong> Simulation en plein écran lancée.
+                <div class="avatar" style="background:#ff3b30">⚙️</div>
+                <div class="msg-content">
+                    <span class="username-wrapper">Système</span>
+                    <span class="msg-text">Mode Plein Écran & Moteur d'audience actif. Double-cliquez sur l'écran pour liker.</span>
+                </div>
             </div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Écris un message..." autocomplete="off">
+            <input type="text" id="chatInput" placeholder="Ajouter un commentaire..." autocomplete="off">
             <button id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -405,225 +442,224 @@
         const totalLikesSpan = document.getElementById('totalLikesRealtime');
         const startOverlay = document.getElementById('appStartOverlay');
         const explicitStartBtn = document.getElementById('explicitStartBtn');
-        const mainContainer = document.getElementById('mainAppContainer');
+        const heartStreamContainer = document.getElementById('heartStream');
         
-        let currentStream = null;
-        let currentFacing = 'user'; 
-        let cameraActive = false;
-        let totalLikes = 342;
-        let viewerCount = 187;
-        let spectatorInterval = null;
-        let viewerInterval = null;
-        let isSwitching = false;
+        let currentStream = null, currentFacing = 'user', cameraActive = false, isSwitching = false;
+        let totalLikes = 342, viewerCount = 187;
+        let mainLoopInterval = null, viewerInterval = null;
+
+        // Base de données pour générer des profils variés
+        const randomUsers = [
+            {n: "Lili_Rose", c: "#ff2d55", v: true}, {n: "Max_Gamer", c: "#4cd964", v: false},
+            {n: "Sophia✨", c: "#5856d6", v: true}, {n: "Alex_Drone", c: "#ff9500", v: false},
+            {n: "Julie_B", c: "#ffcc00", v: false}, {n: "Lucas_Vibes", c: "#5ac8fa", v: false},
+            {n: "Thomas_📸", c: "#007aff", c:"#ff3b30", v: true}, {n: "Emma.Design", c: "#e056fd", v: false}
+        ];
         
-        // Fonction pour forcer l'immersion plein écran (masque la barre d'adresse)
+        const randomComments = [
+            "Génial ce live ! 🔥", "Tu utilises quel téléphone ?", "Incroyable l'effet !", 
+            "Hello depuis Paris ! 👋", "Trop hâte de voir la suite", "Est-ce que ça marche bien ?", 
+            "Top ambiance !! 🎉", "Wow 😍", "Super fluide !", "Je kiffe trop !"
+        ];
+
+        const avatarColors = ["#ff2d55", "#4cd964", "#5856d6", "#ff9500", "#ffcc00", "#5ac8fa", "#007aff", "#e056fd", "#2a9d8f"];
+
         function requestFullscreenMode(element) {
-            if (element.requestFullscreen) {
-                element.requestFullscreen();
-            } else if (element.webkitRequestFullscreen) { /* Safari / iOS */
-                element.webkitRequestFullscreen();
-            } else if (element.msRequestFullscreen) {
-                element.msRequestFullscreen();
+            if (element.requestFullscreen) element.requestFullscreen();
+            else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+        }
+
+        // Système de création graphique de tchat réaliste
+        function appendMessage(username, text, type = 'user', customColor = '#ff9f4a', verified = false) {
+            if (type === 'join') {
+                const joinDiv = document.createElement('div');
+                joinDiv.className = 'join-message fadeSlideUp';
+                joinDiv.innerHTML = `<i class="fas fa-user-plus"></i> <span><strong>${username}</strong> a rejoint le live</span>`;
+                chatDiv.appendChild(joinDiv);
+            } else {
+                const msgItem = document.createElement('div');
+                msgItem.className = `message-item ${type === 'system' ? 'system-message' : ''} ${type === 'my' ? 'my-message' : ''}`;
+                
+                const initials = username.substring(0, 2);
+                const avatarBg = type === 'system' ? '#ff3b30' : (type === 'my' ? '#2a9d8f' : customColor);
+                
+                let verifiedBadge = verified ? `<i class="fas fa-check-circle badge-verified" title="Compte Certifié"></i>` : '';
+                
+                msgItem.innerHTML = `
+                    <div class="avatar" style="background:${avatarBg}">${initials}</div>
+                    <div class="msg-content">
+                        <span class="username-wrapper" style="color:${avatarBg}">${username} ${verifiedBadge}</span>
+                        <span class="msg-text">${text}</span>
+                    </div>
+                `;
+                chatDiv.appendChild(msgItem);
+            }
+            
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            
+            // Nettoyage rigoureux de la mémoire DOM (Limite à 50 éléments visibles)
+            while (chatDiv.children.length > 50) {
+                chatDiv.removeChild(chatDiv.firstChild);
             }
         }
 
-        function addChatMessage(username, text, isSystem = false, isOwn = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message-item');
-            if (isSystem) msgDiv.classList.add('system-message');
-            if (isOwn) msgDiv.classList.add('my-message');
-            const strong = document.createElement('strong');
-            strong.textContent = username + ' ';
-            msgDiv.appendChild(strong);
-            msgDiv.appendChild(document.createTextNode(text));
-            chatDiv.appendChild(msgDiv);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-            while (chatDiv.children.length > 120) chatDiv.removeChild(chatDiv.firstChild);
-        }
-        
-        function showHeart() {
+        // Générateur de cœurs flottants réalistes à la TikTok
+        function triggerFloatingHeart() {
             const heart = document.createElement('div');
-            heart.className = 'heart-animation';
-            heart.innerHTML = '❤️';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
+            heart.className = 'floating-heart';
+            
+            // Propriétés graphiques aléatoires
+            const heartColors = ['#ff2d55', '#ff4757', '#ff6b81', '#ff4757', '#e056fd', '#ff9f4a'];
+            const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+            const randomSize = Math.floor(Math.random() * 10) + 18; // 18px à 28px
+            const randomXEnd = Math.floor(Math.random() * 80) - 40; // Dérive latérale -40px à +40px
+            
+            heart.style.color = randomColor;
+            heart.style.fontSize = `${randomSize}px`;
+            heart.style.setProperty('--x-end', `${randomXEnd}px`);
+            heart.innerHTML = '<i class="fas fa-heart"></i>';
+            
+            heartStreamContainer.appendChild(heart);
+            
+            // Suppression définitive immédiate de la mémoire après l'animation
+            setTimeout(() => { heart.remove(); }, 2200);
         }
-        
+
         function updateLikesUI() {
             likeDisplaySpan.innerText = totalLikes;
             totalLikesSpan.innerText = totalLikes;
         }
-        
+
         function addLikes(amount = 1, animate = true) {
             totalLikes += amount;
-            if (totalLikes < 0) totalLikes = 0;
             updateLikesUI();
-            if (animate) showHeart();
+            if (animate) triggerFloatingHeart();
         }
-        
-        function randomSpectatorLike() {
-            addLikes(1, true);
-            if (Math.random() < 0.35) {
-                const names = ["🌸 Lili", "🔥 Max", "👾 GamerX", "✨ Sophie", "🎸 Rocker", "📸 Lens", "🎧 DJ_Flo", "❤️ Julie"];
-                const name = names[Math.floor(Math.random() * names.length)];
-                const msgs = ["❤️ j'adore!", "Super live!", "👍👍👍", "🔥🔥", "incroyable", "🎉 top", "😍 magnifique"];
-                const msg = msgs[Math.floor(Math.random() * msgs.length)];
-                addChatMessage(name, msg, false, false);
+
+        // Moteur comportemental d'audience dynamique
+        function processAudienceSimulation() {
+            const dice = Math.random();
+            if (dice < 0.25) {
+                // Un spectateur rejoint le live
+                const randName = "User_" + Math.floor(Math.random() * 900 + 100);
+                appendMessage(randName, "", 'join');
+            } else if (dice < 0.65) {
+                // Un spectateur commente
+                const user = randomUsers[Math.floor(Math.random() * randomUsers.length)];
+                const text = randomComments[Math.floor(Math.random() * randomComments.length)];
+                appendMessage(user.n, text, 'user', user.c, user.v);
+                if (Math.random() < 0.4) addLikes(1, true);
+            } else {
+                // Vague de likes spontanés
+                const burst = Math.floor(Math.random() * 3) + 1;
+                for (let i = 0; i < burst; i++) {
+                    setTimeout(() => addLikes(1, true), i * 150);
+                }
             }
         }
-        
-        function randomSpectatorComment() {
-            const fakeNames = ["Marie_92", "TonioLive", "PixelWarrior", "ClaraStyle", "Jules_Vibes", "LensFan", "Nina_Buzz", "Alex_Drone"];
-            const messages = ["Excellent live !", "👏👏 bravo", "Trop drôle", "Encore!!", "Super ambiance", "Vive le direct", "🎶🎶", "Tu gères!", "👍 from Paris", "🔥 ça chauffe"];
-            const randomName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
-            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-            addChatMessage(randomName, randomMsg, false, false);
-            if (Math.random() < 0.5) addLikes(1, true);
-        }
-        
+
         function updateViewers() {
-            const variation = Math.floor(Math.random() * 7) - 2;
-            let newCount = viewerCount + variation;
-            if (newCount < 45) newCount = 45;
-            if (newCount > 1200) newCount = 1100;
-            viewerCount = newCount;
+            const change = Math.floor(Math.random() * 9) - 3; // Fluctuations réalistes (-3 à +5)
+            viewerCount = Math.max(25, viewerCount + change);
             viewerSpan.innerText = viewerCount;
         }
-        
-        function startSimulation() {
-            if (spectatorInterval) clearInterval(spectatorInterval);
-            if (viewerInterval) clearInterval(viewerInterval);
-            spectatorInterval = setInterval(() => {
-                if (Math.random() < 0.6) randomSpectatorComment();
-                else randomSpectatorLike();
-            }, 7000);
-            viewerInterval = setInterval(() => {
-                updateViewers();
-            }, 13000);
-        }
-        
+
         async function stopAndCleanStream() {
             if (currentStream) {
-                currentStream.getTracks().forEach(track => {
-                    if (track.readyState === 'live') track.stop();
-                });
+                currentStream.getTracks().forEach(track => { if (track.readyState === 'live') track.stop(); });
                 currentStream = null;
             }
             video.srcObject = null;
         }
-        
+
         async function initCamera(facingMode) {
             if (isSwitching) return false;
             isSwitching = true;
             await stopAndCleanStream();
-            
             try {
                 let stream;
                 try {
-                    const constraints = {
-                        video: { facingMode: { exact: facingMode } },
-                        audio: false
-                    };
-                    stream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (exactError) {
-                    console.warn("Exact facingMode failed, fallback to generic camera", exactError);
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: facingMode } }, audio: false });
+                } catch (e) {
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 }
-                
                 if (stream) {
-                    currentStream = stream;
-                    video.srcObject = stream;
-                    cameraActive = true;
+                    currentStream = stream; video.srcObject = stream; cameraActive = true;
                     const oldRetry = document.querySelector('.retry-camera');
                     if (oldRetry) oldRetry.remove();
-                    isSwitching = false;
-                    return true;
-                } else {
-                    throw new Error("No stream obtained");
+                    isSwitching = false; return true;
                 }
+                throw new Error("Flux introuvable");
             } catch (err) {
-                console.error("Erreur caméra :", err);
                 cameraActive = false;
-                let errorText = "Impossible d'accéder à la caméra.";
-                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    errorText = "Permission refusée. Autorisez la caméra dans les réglages.";
-                }
-                addChatMessage("📹 ERREUR", errorText, true, false);
-                
+                appendMessage("Caméra", "Accès restreint. Vérifiez vos autorisations système.", 'system');
                 let retryBtn = document.querySelector('.retry-camera');
                 if (!retryBtn) {
                     retryBtn = document.createElement('button');
                     retryBtn.className = 'retry-camera';
-                    retryBtn.innerHTML = '<i class="fas fa-camera"></i> Réessayer caméra';
-                    retryBtn.onclick = async () => {
-                        retryBtn.remove();
-                        await initCamera(currentFacing);
-                    };
+                    retryBtn.innerHTML = '<i class="fas fa-camera"></i> Relancer la caméra';
+                    retryBtn.onclick = async () => { retryBtn.remove(); await initCamera(currentFacing); };
                     video.parentElement.appendChild(retryBtn);
                 }
-                isSwitching = false;
-                return false;
+                isSwitching = false; return false;
             }
         }
-        
+
         async function toggleCamera() {
             if (isSwitching) return;
-            const newFacing = currentFacing === 'user' ? 'environment' : 'user';
-            currentFacing = newFacing;
+            currentFacing = currentFacing === 'user' ? 'environment' : 'user';
             const success = await initCamera(currentFacing);
             if (success) {
-                const msg = currentFacing === 'environment' ? '📱 Caméra ARRIÈRE activée' : '🤳 Caméra AVANT activée';
-                addChatMessage("🎥 SYSTÈME", msg, true, false);
-            } else {
-                currentFacing = currentFacing === 'user' ? 'environment' : 'user';
+                appendMessage("Flux", currentFacing === 'environment' ? "Caméra environnementale active" : "Capteur frontal actif", 'system');
             }
         }
-        
-        function userLikeReaction() {
+
+        function userLikeAction() {
             addLikes(1, true);
-            addChatMessage("Vous", "❤️ a aimé le live !", false, true);
+            appendMessage("Vous", "A aimé votre propre direct", 'my');
         }
-        
-        function sendMessage() {
-            const msg = chatInput.value.trim();
-            if (msg === "") return;
-            addChatMessage("Vous", msg, false, true);
+
+        function handleUserMessage() {
+            const text = chatInput.value.trim();
+            if (text === "") return;
+            appendMessage("Vous", text, 'my');
             chatInput.value = "";
+            
+            // Réaction de la foule : l'envoi d'un message excite temporairement l'audience
+            setTimeout(() => {
+                addLikes(2, true);
+                const fastAnswers = ["Trop vrai !", "Haha grave", "Totalement d'accord 👌"];
+                appendMessage(randomUsers[0].n, fastAnswers[Math.floor(Math.random() * fastAnswers.length)], 'user', randomUsers[0].c, randomUsers[0].v);
+            }, 1200);
         }
+
+        video.addEventListener('dblclick', (e) => { e.preventDefault(); userLikeAction(); });
         
-        video.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            userLikeReaction();
-        });
-        
-        // Clic sur le bouton de démarrage : active le Fullscreen + caméra simultanément
         explicitStartBtn.addEventListener('click', async () => {
-            // 1. Passage immédiat en plein écran (lève la barre d'adresse)
             requestFullscreenMode(document.documentElement);
             
-            // 2. Initialisation du reste de l'application
-            startSimulation();
             updateLikesUI();
             viewerSpan.innerText = viewerCount;
             
-            const cameraStarted = await initCamera('user');
-            if (!cameraStarted) {
-                addChatMessage("📌", "Mode texte uniquement. Vérifiez vos autorisations.");
-            }
+            // Boucle principale adaptative (toutes les 2.8 secondes max)
+            mainLoopInterval = setInterval(processAudienceSimulation, 2800);
+            viewerInterval = setInterval(updateViewers, 9000);
+            
+            await initCamera('user');
             
             startOverlay.style.opacity = '0';
             setTimeout(() => startOverlay.remove(), 400);
         });
-        
+
         switchBtn.addEventListener('click', toggleCamera);
-        likeBtn.addEventListener('click', userLikeReaction);
-        sendBtn.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-        
+        likeBtn.addEventListener('click', userLikeAction);
+        sendBtn.addEventListener('click', handleUserMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUserMessage(); });
+
         window.addEventListener('beforeunload', () => {
             if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-            if (spectatorInterval) clearInterval(spectatorInterval);
-            if (viewerInterval) clearInterval(viewerInterval);
+            clearInterval(mainLoopInterval);
+            clearInterval(viewerInterval);
         });
     })();
 </script>
