@@ -1,686 +1,1296 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation Pro (Moteur V0.3.2.19 SAFE)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* --- DESIGN SYSTEM & CSS TOKENS --- */
-        :root {
-            --primary-color: #00bcd4;
-            --secondary-color: #e91e63;
-            --panel-opacity: 0.42;
-            --panel-radius: 12px;
-            --button-radius: 999px;
-            --gradient-start: #0a192f;
-            --gradient-end: #020c1b;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#05070f">
+  <title>Live Simulator Lab — Version fusionnée optimisée</title>
+  <style>
+    :root {
+      --primary-color: #00bcd4;
+      --secondary-color: #e91e63;
+      --panel-opacity: 0.48;
+      --panel-radius: 12px;
+      --button-radius: 999px;
+      --gradient-start: #0a192f;
+      --gradient-end: #020c1b;
+      --border-question: #ffc107;
+      --border-troll: #ffab40;
+      --border-ambient: rgba(255, 255, 255, 0.75);
+      --safe-top: max(12px, env(safe-area-inset-top));
+      --safe-bottom: max(14px, env(safe-area-inset-bottom));
+      --bg-main: #000;
+      --bg-panel: #141416;
+      --bg-card: #1c1c1e;
+      --bg-field: #2c2c2e;
+      --border-soft: #2e2e33;
+      --text-muted: #9a9aa2;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        body {
-            background: #000;
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
-            touch-action: pan-y;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        /* --- HUB DE CONFIGURATION INITIALE ET ÉTANCHE --- */
-        .setup-hub-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0d0e12;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)) 20px;
-            overflow-y: auto;
-        }
-        .setup-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        .setup-header h1 {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(45deg, #00bcd4, #e91e63);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .setup-header p {
-            font-size: 13px;
-            color: #8e8e93;
-            margin-top: 4px;
-        }
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-main);
+      color: #fff;
+      font-family: "Segoe UI", Roboto, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
 
-        .setup-section {
-            background: #1c1c1e;
-            border: 1px solid #232326;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .setup-section h3 {
-            font-size: 13px;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-        }
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-        .setting-row {
-            margin-bottom: 14px;
-        }
-        .setting-row label {
-            display: block;
-            font-size: 12px;
-            color: #8e8e93;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-        .input-text, select {
-            width: 100%;
-            background: #2c2c2e;
-            border: 1px solid #3a3a3c;
-            border-radius: 8px;
-            padding: 12px;
-            color: #fff;
-            font-size: 14px;
-        }
-        .input-text:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
+    button {
+      cursor: pointer;
+    }
 
-        .option-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .option-card {
-            background: #2c2c2e;
-            border: 2px solid #3a3a3c;
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .option-card i {
-            font-size: 20px;
-            margin-bottom: 6px;
-            display: block;
-            color: #8e8e93;
-        }
-        .option-card.active {
-            border-color: var(--primary-color);
-            background: rgba(0, 188, 212, 0.08);
-        }
-        .option-card.active i {
-            color: var(--primary-color);
-        }
-        .option-title { font-size: 13px; font-weight: 700; display: block; }
-        .option-desc { font-size: 10px; color: #8e8e93; margin-top: 2px; display: block; }
+    .setup-hub-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom));
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(0, 188, 212, 0.18), transparent 34%),
+        radial-gradient(circle at 90% 10%, rgba(233, 30, 99, 0.15), transparent 30%),
+        #0d0e12;
+    }
 
-        .btn-launch-stream {
-            background: linear-gradient(135deg, #00bcd4, #004d40);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
-        }
+    .setup-header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
 
-        /* --- CONTENEUR D'EXÉCUTION DU LIVE --- */
-        .live-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-            background: #000;
-        }
-        .video-area {
-            position: relative;
-            background: #111;
-            flex: 1;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .camera-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        }
+    .setup-header h1 {
+      font-size: clamp(24px, 5vw, 34px);
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        /* CONFIGURATION DISPOSITION MULTI-PANEL */
-        .live-container.layout-computer .video-area { flex: 1.3; }
-        .live-container.layout-computer .monitor-panel {
-            flex: 1;
-            background: #141416;
-            border-left: 1px solid #232326;
-            display: flex;
-            flex-direction: column;
-            padding: 16px;
-        }
-        .live-container.layout-smartphone .monitor-panel { display: none !important; }
+    .setup-header p {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
-        /* --- OVERLAY COUCHE HUD GRAPHIC --- */
-        .hud-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            pointer-events: none;
-            padding: max(12px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)) 12px;
-        }
-        .hud-overlay * { pointer-events: auto; }
+    .setup-layout {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
 
-        /* HEADER ALIGNEMENT DART (IMAGE 2 REPRODUCTION PARFAITE) */
-        .hud-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .streamer-pill {
-            display: flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.45);
-            padding: 4px 10px 4px 4px;
-            border-radius: 999px;
-            backdrop-filter: blur(4px);
-        }
-        .streamer-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-weight: bold;
-        }
-        .streamer-info { display: flex; flex-direction: column; }
-        .streamer-name { font-size: 12px; font-weight: 700; }
-        .streamer-status { font-size: 10px; color: rgba(255,255,255,0.75); }
+    .setup-section {
+      background: rgba(28, 28, 30, 0.92);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    }
 
-        /* ZONE BOUTONS SYSTÈME DU LIVE RESTAURÉE SUR LE HUD */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .hud-system-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .hud-system-btn.btn-active-red {
-            background: #ff1744;
-            border-color: #ff1744;
-        }
-        .hud-system-btn:active {
-            transform: scale(0.9);
-        }
+    .setup-section.full {
+      grid-column: 1 / -1;
+    }
 
-        /* FILTRAGE DU CHAT FEED */
-        .hud-chat-container {
-            position: absolute;
-            bottom: 78px;
-            left: 12px;
-            width: 320px;
-            max-height: 340px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 6px;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .chat-bubble {
-            background: rgba(0, 0, 0, calc(var(--panel-opacity) * 0.82));
-            border-radius: var(--panel-radius);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 7px 10px;
-            font-size: 13px;
-            color: #fff;
-            animation: slideUp 0.18s ease-out forwards;
-            pointer-events: auto;
-        }
-        .chat-bubble-name { font-weight: bold; color: var(--primary-color); margin-right: 6px; display: inline; }
-        .chat-bubble-msg { display: inline; }
+    .setup-section h2 {
+      margin-bottom: 12px;
+      color: var(--primary-color);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .setting-row {
+      margin-bottom: 14px;
+    }
 
-        .hud-bottom-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-        }
-        .hud-input-fake {
-            flex: 1;
-            height: 44px;
-            background: rgba(0, 0, 0, var(--panel-opacity));
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: var(--button-radius);
-            padding: 0 14px;
-            display: flex;
-            align-items: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-        }
-        .action-circle-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.45);
-            border: none;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    .setting-row:last-child {
+      margin-bottom: 0;
+    }
 
-        /* CONSOLE SUP (COMPUTER) */
-        .monitor-panel h2 { font-size: 16px; margin-bottom: 12px; color: #fff; }
-        .log-box {
-            flex: 1;
-            background: #0b0b0c;
-            border: 1px solid #232326;
-            border-radius: 8px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow-y: auto;
-            color: #a1a1aa;
-        }
-        .log-line { margin-bottom: 4px; }
-        .log-line .tag { color: var(--primary-color); font-weight: bold; }
+    .setting-row label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-        .heart-particle {
-            position: absolute;
-            bottom: 80px;
-            right: 20px;
-            font-size: 24px;
-            pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.8); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
-        }
-    </style>
+    .input-text,
+    select {
+      width: 100%;
+      min-height: 43px;
+      border: 1px solid #3a3a3c;
+      border-radius: 10px;
+      padding: 11px 12px;
+      background: var(--bg-field);
+      color: #fff;
+      outline: none;
+    }
+
+    .input-text:focus,
+    select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent);
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .option-card {
+      border: 2px solid #3a3a3c;
+      border-radius: 13px;
+      padding: 14px 12px;
+      background: var(--bg-field);
+      color: #fff;
+      text-align: center;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .option-card:active {
+      transform: scale(0.97);
+    }
+
+    .option-card.active {
+      border-color: var(--primary-color);
+      background: color-mix(in srgb, var(--primary-color) 13%, #2c2c2e);
+    }
+
+    .option-icon {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .option-title {
+      display: block;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .option-desc {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 10.5px;
+    }
+
+    .btn-launch-stream {
+      width: min(980px, 100%);
+      min-height: 54px;
+      margin: 4px auto 0;
+      border: 0;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 35%, #004d40));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--primary-color) 28%, transparent);
+    }
+
+    .setup-note {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .live-container {
+      position: relative;
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+
+    .video-area {
+      position: relative;
+      flex: 1.32;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .camera-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .camera-preview.camera-hidden {
+      display: none;
+    }
+
+    .fallback-visual {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--primary-color) 35%, transparent), transparent 34%),
+        radial-gradient(circle at 80% 76%, color-mix(in srgb, var(--secondary-color) 26%, transparent), transparent 30%),
+        linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .fallback-visual span {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.26);
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hud-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--safe-top) 12px var(--safe-bottom);
+      pointer-events: none;
+    }
+
+    .hud-overlay * {
+      pointer-events: auto;
+    }
+
+    .hud-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .streamer-pill {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      max-width: min(68vw, 420px);
+      padding: 4px 12px 4px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+    }
+
+    .streamer-avatar {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      margin-right: 8px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: #000;
+      font-weight: 900;
+    }
+
+    .streamer-info {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .streamer-name {
+      max-width: 220px;
+      overflow: hidden;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .streamer-meta-row,
+    .streamer-stats-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+      color: rgba(255, 255, 255, 0.80);
+      font-size: 10.8px;
+      white-space: nowrap;
+    }
+
+    .streamer-location {
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge-live {
+      border-radius: 5px;
+      padding: 3px 6px;
+      background: #ff1744;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .stat-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .stat-eye {
+      color: var(--primary-color);
+    }
+
+    .stat-heart {
+      color: #ff1744;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-system-btn,
+    .action-circle-btn {
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.58);
+      color: #fff;
+      backdrop-filter: blur(6px);
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .hud-system-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 16px;
+    }
+
+    .action-circle-btn {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+      font-size: 18px;
+    }
+
+    .hud-system-btn:active,
+    .action-circle-btn:active {
+      transform: scale(0.92);
+    }
+
+    .btn-active-red {
+      border-color: #ff1744 !important;
+      background: #ff1744 !important;
+    }
+
+    .hud-chat-container {
+      position: absolute;
+      left: 12px;
+      bottom: 78px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+      width: min(320px, calc(100vw - 24px));
+      max-height: min(340px, 45vh);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .comment-bubble {
+      max-width: 100%;
+      padding: 8px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 4px solid var(--border-ambient);
+      border-radius: var(--panel-radius);
+      background: rgba(0, 0, 0, calc(var(--panel-opacity) * 0.88));
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.38;
+      word-wrap: break-word;
+      animation: slideUp 0.18s ease-out both;
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+    }
+
+    .comment-bubble.bubble-common,
+    .comment-bubble.bubble-offtopic_life {
+      border-left-color: var(--border-ambient);
+    }
+
+    .comment-bubble.bubble-hype,
+    .comment-bubble.bubble-reaction {
+      border-left-color: var(--primary-color);
+    }
+
+    .comment-bubble.bubble-gift,
+    .comment-bubble.bubble-giftReaction {
+      border-left-color: var(--secondary-color);
+    }
+
+    .comment-bubble.bubble-questions,
+    .comment-bubble.bubble-question {
+      border-left-color: var(--border-question);
+    }
+
+    .comment-bubble.bubble-slang,
+    .comment-bubble.bubble-troll_light,
+    .comment-bubble.bubble-lightTroll {
+      border-left-color: var(--border-troll);
+    }
+
+    .comment-username {
+      margin-right: 6px;
+      color: rgba(255, 255, 255, 0.72);
+      font-weight: 900;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hud-bottom-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .chat-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--button-radius);
+      background: rgba(0, 0, 0, var(--panel-opacity));
+      backdrop-filter: blur(6px);
+    }
+
+    .chat-input-field {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .chat-input-field::placeholder {
+      color: rgba(255, 255, 255, 0.48);
+    }
+
+    .heart-particle,
+    .gift-particle {
+      position: absolute;
+      z-index: 100;
+      pointer-events: none;
+      animation: floatUp 0.9s ease-out forwards;
+    }
+
+    .heart-particle {
+      bottom: 78px;
+      font-size: 26px;
+    }
+
+    .gift-particle {
+      top: 35%;
+      font-size: 32px;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.72);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-140px) scale(1.28) rotate(12deg);
+      }
+    }
+
+    .monitor-panel {
+      flex: 1;
+      min-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100vh;
+      padding: 16px;
+      border-left: 1px solid #232326;
+      background: var(--bg-panel);
+    }
+
+    .monitor-panel h2 {
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric-box {
+      min-height: 70px;
+      border: 1px solid #232326;
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--bg-card);
+      text-align: center;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 10.5px;
+      text-transform: uppercase;
+    }
+
+    .metric-val {
+      margin-top: 6px;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .log-box {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      border: 1px solid #232326;
+      border-radius: 12px;
+      padding: 10px;
+      background: #0b0b0c;
+      color: #a1a1aa;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .log-line {
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .log-line .tag {
+      color: var(--primary-color);
+      font-weight: 900;
+    }
+
+    .live-container.layout-smartphone .monitor-panel {
+      display: none !important;
+    }
+
+    .live-container.layout-smartphone .video-area {
+      flex: 1;
+    }
+
+    .live-container.layout-smartphone .streamer-pill {
+      max-width: calc(100vw - 182px);
+    }
+
+    .live-container.layout-smartphone .hud-system-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    @media (max-width: 760px) {
+      .setup-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .live-container {
+        display: block;
+      }
+
+      .video-area {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .monitor-panel {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 6px;
+      }
+
+      .hud-system-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 15px;
+      }
+
+      .action-circle-btn {
+        width: 42px;
+        height: 42px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
+  <main class="setup-hub-screen" id="setupHub" aria-label="Configuration de la session">
+    <header class="setup-header">
+      <h1>LIVE SIMULATOR LAB</h1>
+      <p>Version fusionnée optimisée — moteur V0.3.2.20 + éléments conservés des variantes précédentes</p>
+    </header>
 
-<div class="setup-hub-screen" id="setupHub">
-    <div class="setup-header">
-        <h1>LIVE SIMULATOR LAB</h1>
-        <p>Phase de paramétrage de la session de simulation</p>
-    </div>
-
-    <div class="setup-section">
-        <h3>1. Environnement d'affichage</h3>
-        <div class="option-grid">
-            <div class="option-card" id="targetSmartphone" onclick="setTargetDevice('smartphone')">
-                <i class="fas fa-mobile-alt"></i>
-                <span class="option-title">SMARTPHONE</span>
-                <span class="option-desc">Plein écran, backoffice masqué</span>
-            </div>
-            <div class="option-card active" id="targetComputer" onclick="setTargetDevice('computer')">
-                <i class="fas fa-desktop"></i>
-                <span class="option-title">COMPUTER</span>
-                <span class="option-desc">Affichage scindé avec console</span>
-            </div>
+    <section class="setup-layout">
+      <div class="setup-section">
+        <h2>1. Environnement cible</h2>
+        <div class="option-grid" role="group" aria-label="Choix de l’environnement">
+          <button class="option-card" id="targetSmartphone" type="button" onclick="setTargetDevice('smartphone')">
+            <span class="option-icon">📱</span>
+            <span class="option-title">SMARTPHONE</span>
+            <span class="option-desc">plein écran, console masquée</span>
+          </button>
+          <button class="option-card active" id="targetComputer" type="button" onclick="setTargetDevice('computer')">
+            <span class="option-icon">🖥️</span>
+            <span class="option-title">COMPUTER</span>
+            <span class="option-desc">live + supervision</span>
+          </button>
         </div>
-    </div>
+      </div>
 
-    <div class="setup-section">
-        <h3>2. Profil du diffuseur</h3>
+      <div class="setup-section">
+        <h2>2. Profil diffuseur</h2>
         <div class="setting-row">
-            <label>Nom d'utilisateur</label>
-            <input type="text" class="input-text" id="cfgUsername" value="creator_lab">
-        </div>
-        <div class="setting-row">
-            <label>Statut / Localisation</label>
-            <input type="text" class="input-text" id="cfgLocation" value="En direct">
+          <label for="cfgUsername">Nom d’affichage</label>
+          <input type="text" class="input-text" id="cfgUsername" value="creator_lab" maxlength="32" autocomplete="off">
         </div>
         <div class="setting-row">
-            <label>Capteur Caméra Initial</label>
-            <select id="cfgCamera">
-                <option value="user">Caméra Avant (Miroir)</option>
-                <option value="environment">Caméra Arrière</option>
-                <option value="none">Aucune (Arrière-plan dégradé)</option>
-            </select>
+          <label for="cfgLocation">Statut / localisation</label>
+          <input type="text" class="input-text" id="cfgLocation" value="Live local" maxlength="42" autocomplete="off">
         </div>
-    </div>
+      </div>
 
-    <div class="setup-section">
-        <h3>3. Skin & Filtre Graphique</h3>
+      <div class="setup-section">
+        <h2>3. Caméra & rendu</h2>
         <div class="setting-row">
-            <label>Sélection de l'interface</label>
-            <select id="cfgSkin" onchange="previewSkinChange(this.value)">
-                <option value="blueSocial">BlueSocial (Cyan / Cyber)</option>
-                <option value="redVideo">RedVideo (Rouge / Média)</option>
-                <option value="debug">Debug Mode (Vert / Matrice)</option>
-            </select>
+          <label for="cfgCamera">Capteur caméra initial</label>
+          <select id="cfgCamera">
+            <option value="user">Caméra avant — miroir</option>
+            <option value="environment">Caméra arrière</option>
+            <option value="none">Aucune — fond dégradé</option>
+          </select>
         </div>
-    </div>
-
-    <button class="btn-launch-stream" onclick="launchSimulationSession()">
-        <i class="fas fa-play"></i> Lancer le Stream
-    </button>
-</div>
-
-<div class="live-container layout-computer" id="mainContainer">
-    
-    <div class="video-area">
-        <video class="camera-preview" id="webcamSrc" autoplay playsinline muted></video>
-        <div id="particleSpace"></div>
-
-        <div class="hud-overlay">
-            <div class="hud-header">
-                <div class="streamer-pill">
-                    <div class="streamer-avatar" id="hudAvatar">U</div>
-                    <div class="streamer-info">
-                        <span class="streamer-name" id="hudUsername">user_lab</span>
-                        <span class="streamer-status" id="hudLocation">En direct</span>
-                    </div>
-                </div>
-                
-                <div class="header-actions">
-                    <button class="hud-system-btn" id="hudMicBtn" onclick="toggleMicrophone()" title="Muter le micro">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <button class="hud-system-btn" id="hudCamBtn" onclick="toggleCameraHardware()" title="Couper le flux vidéo">
-                        <i class="fas fa-video"></i>
-                    </button>
-                    <button class="hud-system-btn" id="hudReverseBtn" onclick="reverseCameraFacing()" title="Inverser le capteur">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button class="hud-system-btn btn-active-red" onclick="stopSimulationSession()" title="Quitter le live">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="hud-chat-container" id="hudChatFeed"></div>
-
-            <div class="hud-bottom-actions">
-                <div class="hud-input-fake">Écrire un commentaire...</div>
-                <button class="action-circle-btn" id="sendLikeBtn"><i class="fas fa-heart"></i></button>
-            </div>
+        <div class="setting-row">
+          <label for="cfgSkin">Skin graphique</label>
+          <select id="cfgSkin" onchange="previewSkinChange(this.value)">
+            <option value="blueSocial">BlueSocial — cyan</option>
+            <option value="redVideo">RedVideo — rouge</option>
+            <option value="debug">Debug Mode — matrice</option>
+            <option value="tropical">Tropical — Polynésie</option>
+          </select>
         </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>4. Moteur d’audience</h2>
+        <div class="setting-row">
+          <label for="cfgActivity">Rythme des commentaires</label>
+          <select id="cfgActivity">
+            <option value="normal">Normal</option>
+            <option value="slow">Calme</option>
+            <option value="chaos">Très actif</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="cfgMaxComments">Commentaires visibles maximum</label>
+          <select id="cfgMaxComments">
+            <option value="7">7</option>
+            <option value="9" selected>9 — canonique</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <button class="btn-launch-stream" type="button" onclick="launchSimulationSession()">▶ Lancer le live</button>
+    <p class="setup-note">La caméra fonctionne uniquement sur une page HTTPS ou en local. Le mode micro est un interrupteur visuel sûr : aucun enregistrement audio n’est lancé dans cette version HTML.</p>
+  </main>
+
+  <section class="live-container layout-computer" id="mainContainer" aria-label="Session live">
+    <div class="video-area" id="videoArea">
+      <div class="fallback-visual" id="fallbackVisual"><span id="fallbackLabel">Fond live prêt</span></div>
+      <video class="camera-preview camera-hidden" id="webcamSrc" autoplay playsinline muted></video>
+      <div id="particleSpace" aria-hidden="true"></div>
+
+      <div class="hud-overlay">
+        <div class="hud-header">
+          <div class="streamer-pill">
+            <div class="streamer-avatar" id="hudAvatar">C</div>
+            <div class="streamer-info">
+              <span class="streamer-name" id="hudUsername">creator_lab</span>
+              <div class="streamer-meta-row">
+                <span class="badge-live" id="liveBadge">DIRECT</span>
+                <span class="streamer-location" id="hudLocation">Live local</span>
+              </div>
+              <div class="streamer-stats-row">
+                <span class="stat-item"><span class="stat-eye">◉</span><span id="viewerCountDisplay">0</span></span>
+                <span class="stat-item"><span class="stat-heart">♥</span><span id="likeCountDisplay">0</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="header-actions" aria-label="Contrôles live">
+            <button class="hud-system-btn" id="hudMicBtn" type="button" onclick="toggleMicrophone()" title="Micro">🎤</button>
+            <button class="hud-system-btn" id="hudCamBtn" type="button" onclick="toggleCameraHardware()" title="Caméra">🎥</button>
+            <button class="hud-system-btn" id="hudReverseBtn" type="button" onclick="reverseCameraFacing()" title="Inverser caméra">🔄</button>
+            <button class="hud-system-btn btn-active-red" type="button" onclick="stopSimulationSession()" title="Quitter">×</button>
+          </div>
+        </div>
+
+        <div class="hud-chat-container" id="hudChatFeed" aria-live="polite"></div>
+
+        <div class="hud-bottom-actions">
+          <div class="chat-input-wrapper">
+            <input type="text" class="chat-input-field" id="chatInputField" placeholder="Écrire un commentaire..." maxlength="160" autocomplete="off">
+          </div>
+          <button class="action-circle-btn" id="sendMsgBtn" type="button" onclick="executeUserComment()" title="Envoyer">➤</button>
+          <button class="action-circle-btn" id="sendLikeBtn" type="button" onclick="triggerUserLike()" title="Like">♥</button>
+          <button class="action-circle-btn" id="sendGiftBtn" type="button" onclick="triggerGift()" title="Gift">🎁</button>
+        </div>
+      </div>
     </div>
 
-    <div class="monitor-panel">
-        <h2>Console de Supervision</h2>
-        <div class="log-box" id="backofficeLog"></div>
-    </div>
+    <aside class="monitor-panel" id="monitorPanel" aria-label="Console de supervision">
+      <h2>Console de supervision realtime</h2>
+      <div class="metrics-grid">
+        <div class="metric-box"><div class="metric-label">Viewers</div><div class="metric-val" id="metricViewers">0</div></div>
+        <div class="metric-box"><div class="metric-label">Likes</div><div class="metric-val" id="metricLikes">0</div></div>
+        <div class="metric-box"><div class="metric-label">Mode</div><div class="metric-val" id="metricMode">IDLE</div></div>
+      </div>
+      <div class="log-box" id="backofficeLog"></div>
+    </aside>
+  </section>
 
-</div>
+  <script>
+    "use strict";
 
-<script>
+    const APP_VERSION = "V0.3.2.20-MERGED-OPTIMIZED";
+
     const SKIN_REPOSITORY = {
-        'blueSocial': { primary: '#00bcd4', secondary: '#e91e63', bgStart: '#0a192f', bgEnd: '#020c1b', opacity: 0.42, panelRadius: '12px', buttonRadius: '999px' },
-        'redVideo': { primary: '#ff1744', secondary: '#ffffff', bgStart: '#1a0508', bgEnd: '#050001', opacity: 0.60, panelRadius: '8px', buttonRadius: '8px' },
-        'debug': { primary: '#00ff00', secondary: '#ff00ff', bgStart: '#000000', bgEnd: '#111111', opacity: 0.75, panelRadius: '0px', buttonRadius: '0px' }
+      blueSocial: { primary: "#00bcd4", secondary: "#e91e63", bgStart: "#0a192f", bgEnd: "#020c1b", opacity: 0.48, panelRadius: "12px", buttonRadius: "999px" },
+      redVideo: { primary: "#ff1744", secondary: "#ffffff", bgStart: "#1a0508", bgEnd: "#050001", opacity: 0.60, panelRadius: "8px", buttonRadius: "8px" },
+      debug: { primary: "#00ff00", secondary: "#ff00ff", bgStart: "#000000", bgEnd: "#111111", opacity: 0.75, panelRadius: "0px", buttonRadius: "0px" },
+      tropical: { primary: "#26d7c7", secondary: "#ffb347", bgStart: "#003f5c", bgEnd: "#07111f", opacity: 0.52, panelRadius: "16px", buttonRadius: "999px" }
     };
 
-    const MOCK_USERNAMES = ['Alex_92', 'Lara_Croft', 'Dorian_G', 'Sophie.Tech', 'AlphaRoméo', 'User9482', 'GamerPro', 'Chloee_Star'];
-    const MOCK_PHRASES = [
-        "Le live est vraiment super sympa ce soir !",
-        "Tu utilises quel type de caméra pour ce rendu ?",
-        "Incroyable cette démo ! Let's go !! 🔥",
-        "Est-ce que le projet est open-source ?",
-        "C'est propre, rien à redire sur le cadrage.",
-        "Grosse ambiance ici !"
+    const MOCK_USERNAMES = [
+      "Alex_92", "Lara_Croft", "Dorian_G", "Sophie.Tech", "AlphaRoméo", "User9482", "GamerPro", "Chloee_Star",
+      "Max_Power", "NinaByte", "TahitiWave", "NeoViewer", "MikaLive", "Yumi_404"
     ];
 
-    let targetDevice = 'computer';
-    let localStream = null;
-    let commentInterval = null;
-    let activeBubblesCount = 0;
-    let currentCameraFacing = 'user';
-    let isMicMuted = false;
-    let isCamOff = false;
+    const MOCK_DATA = {
+      common: ["Salut le live", "Ça rend bien", "On est là", "Bonne énergie", "La qualité est propre", "Tranquille ce live", "Le cadrage est clean"],
+      hype: ["Incroyable", "Trop fort", "Let’s go", "Grosse ambiance", "Ça monte fort", "Ambiance de feu", "Le live est propre"],
+      offtopic_life: ["Mon chat vient de renverser mon café", "Il pleut chez moi", "Je mange une pizza en regardant", "Vivement le week-end", "J’arrive juste, j’ai raté quoi ?"],
+      questions: ["Tu fais ça depuis combien de temps ?", "Tu peux montrer la config ?", "C’est quoi ton setup ?", "Tu lis tous les messages ?", "Tu utilises quelle caméra ?"],
+      slang: ["Wesh ça va ou quoi", "C’est clean frérot", "J’suis mort de rire", "Askip c’est la hype", "Sah c’est bien", "C’est lourd"],
+      troll_light: ["Je bug ou ça lag un peu ?", "Qui a invité le bot ?", "Le silence est gênant", "On dirait presque un vrai live haha"],
+      gift: ["a envoyé un gift", "balance un cadeau", "envoie du soutien", "vient de drop un gift"]
+    };
+
+    const state = {
+      targetDevice: window.innerWidth <= 760 ? "smartphone" : "computer",
+      localStream: null,
+      commentInterval: null,
+      statsInterval: null,
+      hypeTimeout: null,
+      activeCommentsCount: 0,
+      maxComments: 9,
+      currentCameraFacing: "user",
+      isMicMuted: false,
+      isCamOff: false,
+      totalLikes: 142,
+      viewerCount: 85,
+      activityMode: "normal",
+      sessionStarted: false,
+      totalComments: 0
+    };
+
+    const $ = (id) => document.getElementById(id);
 
     function setTargetDevice(device) {
-        targetDevice = device;
-        document.getElementById('targetSmartphone').classList.toggle('active', device === 'smartphone');
-        document.getElementById('targetComputer').classList.toggle('active', device === 'computer');
+      state.targetDevice = device === "smartphone" ? "smartphone" : "computer";
+      $("targetSmartphone").classList.toggle("active", state.targetDevice === "smartphone");
+      $("targetComputer").classList.toggle("active", state.targetDevice === "computer");
+      saveConfig();
     }
 
     function previewSkinChange(skinId) {
-        const skin = SKIN_REPOSITORY[skinId];
-        if (skin) {
-            document.documentElement.style.setProperty('--primary-color', skin.primary);
-        }
+      applySkin(skinId);
+      saveConfig();
     }
 
-    // GESTION LIVE : INTERRUPTEURS INTERNES TEMPS RÉEL (HUD)
-    function toggleMicrophone() {
-        isMicMuted = !isMicMuted;
-        const btn = document.getElementById('hudMicBtn');
-        if (isMicMuted) {
-            btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-            btn.classList.add('btn-active-red');
-            appendLog("[HUD ACTION] Microphone coupé (Mute)");
-        } else {
-            btn.innerHTML = '<i class="fas fa-microphone"></i>';
-            btn.classList.remove('btn-active-red');
-            appendLog("[HUD ACTION] Microphone activé");
-        }
+    function saveConfig() {
+      const cfg = {
+        targetDevice: state.targetDevice,
+        username: $("cfgUsername").value,
+        location: $("cfgLocation").value,
+        camera: $("cfgCamera").value,
+        skin: $("cfgSkin").value,
+        activity: $("cfgActivity").value,
+        maxComments: $("cfgMaxComments").value
+      };
+      try { localStorage.setItem("lsl_html_merged_config", JSON.stringify(cfg)); } catch (_) {}
     }
 
-    async function toggleCameraHardware() {
-        isCamOff = !isCamOff;
-        const btn = document.getElementById('hudCamBtn');
-        const videoElement = document.getElementById('webcamSrc');
-        
-        if (isCamOff) {
-            btn.innerHTML = '<i class="fas fa-video-slash"></i>';
-            btn.classList.add('btn-active-red');
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            videoElement.style.display = 'none';
-            appendLog("[HUD ACTION] Flux optique stoppé (Cam Off)");
-        } else {
-            btn.innerHTML = '<i class="fas fa-video"></i>';
-            btn.classList.remove('btn-active-red');
-            videoElement.style.display = 'block';
-            await initCamera(currentCameraFacing);
-            appendLog("[HUD ACTION] Flux optique restauré");
-        }
-    }
-
-    async function reverseCameraFacing() {
-        if (isCamOff) return; // Inutile de permuter si la caméra est désactivée
-        currentCameraFacing = currentCameraFacing === 'user' ? 'environment' : 'user';
-        await initCamera(currentCameraFacing);
-        appendLog(`[HUD ACTION] Permutation du capteur vidéo -> ${currentCameraFacing}`);
-    }
-
-    // RUNTIME ENGINE : INITIALISATION SESSION LIVE
-    async function launchSimulationSession() {
-        const username = document.getElementById('cfgUsername').value.trim() || 'creator_lab';
-        const location = document.getElementById('cfgLocation').value.trim() || 'En direct';
-        currentCameraFacing = document.getElementById('cfgCamera').value;
-        const skinId = document.getElementById('cfgSkin').value;
-
-        // Reset états boutons HUD
-        isMicMuted = false;
-        isCamOff = false;
-        document.getElementById('hudMicBtn').innerHTML = '<i class="fas fa-microphone"></i>';
-        document.getElementById('hudMicBtn').classList.remove('btn-active-red');
-        document.getElementById('hudCamBtn').innerHTML = '<i class="fas fa-video"></i>';
-        document.getElementById('hudCamBtn').classList.remove('btn-active-red');
-
-        document.getElementById('hudUsername').innerText = username;
-        document.getElementById('hudLocation').innerText = location;
-        document.getElementById('hudAvatar').innerText = username.charAt(0).toUpperCase();
-        
-        applySkin(skinId);
-
-        const container = document.getElementById('mainContainer');
-        if (targetDevice === 'smartphone') {
-            container.className = "live-container layout-smartphone";
-            const docEl = document.documentElement;
-            if (docEl.requestFullscreen) docEl.requestFullscreen();
-            else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-        } else {
-            container.className = "live-container layout-computer";
-        }
-
-        await initCamera(currentCameraFacing);
-        document.getElementById('setupHub').style.display = 'none';
-        startEngineLoops();
-        appendLog(`Session lancée avec succès (Appareil: ${targetDevice.toUpperCase()})`);
-    }
-
-    function stopSimulationSession() {
-        clearInterval(commentInterval);
-        commentInterval = null;
-
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        document.getElementById('webcamSrc').srcObject = null;
-
-        const feedContainer = document.getElementById('hudChatFeed');
-        feedContainer.innerHTML = '';
-        activeBubblesCount = 0;
-
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
-
-        document.getElementById('setupHub').style.display = 'flex';
-        appendLog("Session détruite. Retour au hub de configuration.");
+    function restoreConfig() {
+      try {
+        const raw = localStorage.getItem("lsl_html_merged_config");
+        if (!raw) return;
+        const cfg = JSON.parse(raw);
+        if (cfg.username) $("cfgUsername").value = cfg.username;
+        if (cfg.location) $("cfgLocation").value = cfg.location;
+        if (cfg.camera) $("cfgCamera").value = cfg.camera;
+        if (cfg.skin && SKIN_REPOSITORY[cfg.skin]) $("cfgSkin").value = cfg.skin;
+        if (cfg.activity) $("cfgActivity").value = cfg.activity;
+        if (cfg.maxComments) $("cfgMaxComments").value = cfg.maxComments;
+        if (cfg.targetDevice) state.targetDevice = cfg.targetDevice;
+      } catch (_) {}
     }
 
     function applySkin(skinId) {
-        const skin = SKIN_REPOSITORY[skinId];
-        const root = document.documentElement;
-        root.style.setProperty('--primary-color', skin.primary);
-        root.style.setProperty('--secondary-color', skin.secondary);
-        root.style.setProperty('--gradient-start', skin.bgStart);
-        root.style.setProperty('--gradient-end', skin.bgEnd);
-        root.style.setProperty('--panel-opacity', skin.opacity);
-        root.style.setProperty('--panel-radius', skin.panelRadius);
-        root.style.setProperty('--button-radius', skin.buttonRadius);
+      const skin = SKIN_REPOSITORY[skinId] || SKIN_REPOSITORY.blueSocial;
+      const root = document.documentElement;
+      root.style.setProperty("--primary-color", skin.primary);
+      root.style.setProperty("--secondary-color", skin.secondary);
+      root.style.setProperty("--gradient-start", skin.bgStart);
+      root.style.setProperty("--gradient-end", skin.bgEnd);
+      root.style.setProperty("--panel-opacity", String(skin.opacity));
+      root.style.setProperty("--panel-radius", skin.panelRadius);
+      root.style.setProperty("--button-radius", skin.buttonRadius);
+    }
+
+    function sanitizeText(value, fallback) {
+      const clean = String(value || "").replace(/[\u0000-\u001F\u007F]/g, "").trim();
+      return clean || fallback;
+    }
+
+    function setText(id, value) {
+      const node = $(id);
+      if (node) node.textContent = String(value);
+    }
+
+    function resetHudButtons() {
+      state.isMicMuted = false;
+      state.isCamOff = false;
+      $("hudMicBtn").textContent = "🎤";
+      $("hudCamBtn").textContent = "🎥";
+      $("hudMicBtn").classList.remove("btn-active-red");
+      $("hudCamBtn").classList.remove("btn-active-red");
+    }
+
+    async function launchSimulationSession() {
+      saveConfig();
+      clearTimers();
+      resetHudButtons();
+
+      const username = sanitizeText($("cfgUsername").value, "creator_lab");
+      const location = sanitizeText($("cfgLocation").value, "Live local");
+      state.currentCameraFacing = $("cfgCamera").value;
+      state.activityMode = $("cfgActivity").value || "normal";
+      state.maxComments = Number.parseInt($("cfgMaxComments").value, 10) || 9;
+      state.activeCommentsCount = 0;
+      state.totalComments = 0;
+      state.viewerCount = state.activityMode === "chaos" ? 185 : 85;
+      state.totalLikes = 142;
+      state.sessionStarted = true;
+
+      setText("hudUsername", username);
+      setText("hudLocation", location);
+      setText("hudAvatar", username.charAt(0).toUpperCase());
+      setText("liveBadge", getLiveBadgeLabel());
+      $("hudChatFeed").innerHTML = "";
+      $("backofficeLog").innerHTML = "";
+      applySkin($("cfgSkin").value);
+      updateStatsDisplay();
+
+      const container = $("mainContainer");
+      container.className = `live-container layout-${state.targetDevice}`;
+
+      if (state.targetDevice === "smartphone") {
+        requestFullscreenSafe();
+      }
+
+      $("setupHub").style.display = "none";
+      await initCamera(state.currentCameraFacing);
+      startEngineLoops();
+      appendLog(`Session lancée — ${APP_VERSION} — mode ${state.targetDevice.toUpperCase()}`);
+      addSystemWarmupComments(username);
+    }
+
+    function getLiveBadgeLabel() {
+      const navLang = (navigator.language || "fr").slice(0, 2).toLowerCase();
+      const map = { fr: "DIRECT", en: "LIVE", es: "EN VIVO", ru: "ЭФИР", zh: "直播", ja: "ライブ", ko: "라이브" };
+      return map[navLang] || "LIVE";
+    }
+
+    function requestFullscreenSafe() {
+      const docEl = document.documentElement;
+      const fn = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+      if (fn) {
+        try { fn.call(docEl); } catch (_) {}
+      }
+    }
+
+    function exitFullscreenSafe() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) return;
+      const fn = document.exitFullscreen || document.webkitExitFullscreen;
+      if (fn) {
+        try { fn.call(document); } catch (_) {}
+      }
+    }
+
+    function stopSimulationSession() {
+      clearTimers();
+      stopCameraStream();
+      state.sessionStarted = false;
+      state.activeCommentsCount = 0;
+      $("hudChatFeed").innerHTML = "";
+      $("particleSpace").innerHTML = "";
+      $("webcamSrc").classList.add("camera-hidden");
+      setText("fallbackLabel", "Fond live prêt");
+      exitFullscreenSafe();
+      $("setupHub").style.display = "flex";
+      appendLog("Session arrêtée. Retour au hub de configuration.");
+    }
+
+    function clearTimers() {
+      clearInterval(state.commentInterval);
+      clearInterval(state.statsInterval);
+      clearTimeout(state.hypeTimeout);
+      state.commentInterval = null;
+      state.statsInterval = null;
+      state.hypeTimeout = null;
+    }
+
+    function stopCameraStream() {
+      if (state.localStream) {
+        state.localStream.getTracks().forEach((track) => track.stop());
+      }
+      state.localStream = null;
+      $("webcamSrc").srcObject = null;
     }
 
     async function initCamera(facing) {
-        const videoElement = document.getElementById('webcamSrc');
-        if (facing === 'none') {
-            videoElement.style.display = 'none';
-            return;
-        }
-        videoElement.style.display = 'block';
-        videoElement.style.transform = facing === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
-        
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-        }
+      const videoElement = $("webcamSrc");
+      stopCameraStream();
 
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
-            videoElement.srcObject = localStream;
-        } catch (err) {
-            console.warn("Caméra inaccessible", err);
-            videoElement.style.display = 'none';
-        }
+      if (facing === "none") {
+        videoElement.classList.add("camera-hidden");
+        setText("fallbackLabel", "Mode fond dégradé");
+        appendLog("Caméra désactivée par configuration.");
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        videoElement.classList.add("camera-hidden");
+        setText("fallbackLabel", "Caméra indisponible sur ce navigateur");
+        appendLog("Caméra indisponible : getUserMedia non supporté.");
+        return;
+      }
+
+      videoElement.style.transform = facing === "user" ? "scaleX(-1)" : "scaleX(1)";
+      videoElement.classList.remove("camera-hidden");
+
+      try {
+        state.localStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing } },
+          audio: false
+        });
+        videoElement.srcObject = state.localStream;
+        setText("fallbackLabel", "");
+        appendLog(`Caméra active — facingMode=${facing}`);
+      } catch (err) {
+        videoElement.classList.add("camera-hidden");
+        setText("fallbackLabel", "Caméra refusée ou indisponible");
+        appendLog(`Caméra inaccessible — ${err && err.name ? err.name : "erreur inconnue"}`);
+      }
+    }
+
+    function toggleMicrophone() {
+      state.isMicMuted = !state.isMicMuted;
+      const btn = $("hudMicBtn");
+      btn.textContent = state.isMicMuted ? "🔇" : "🎤";
+      btn.classList.toggle("btn-active-red", state.isMicMuted);
+      appendLog(`Micro visuel -> ${state.isMicMuted ? "OFF" : "ON"}. Aucun enregistrement audio lancé.`);
+      if (state.sessionStarted) {
+        injectCommentBubble(randomUser(), state.isMicMuted ? "Le micro est coupé ?" : "On entend mieux là", state.isMicMuted ? "questions" : "common");
+      }
+    }
+
+    async function toggleCameraHardware() {
+      state.isCamOff = !state.isCamOff;
+      const btn = $("hudCamBtn");
+      btn.textContent = state.isCamOff ? "📷" : "🎥";
+      btn.classList.toggle("btn-active-red", state.isCamOff);
+
+      if (state.isCamOff) {
+        stopCameraStream();
+        $("webcamSrc").classList.add("camera-hidden");
+        setText("fallbackLabel", "Caméra coupée");
+        appendLog("Flux vidéo stoppé depuis le HUD.");
+        injectCommentBubble(randomUser(), "La caméra est coupée", "questions");
+      } else {
+        appendLog("Restauration du flux vidéo depuis le HUD.");
+        await initCamera(state.currentCameraFacing === "none" ? "user" : state.currentCameraFacing);
+      }
+    }
+
+    async function reverseCameraFacing() {
+      if (state.isCamOff) {
+        appendLog("Permutation ignorée : caméra coupée.");
+        return;
+      }
+      state.currentCameraFacing = state.currentCameraFacing === "user" ? "environment" : "user";
+      appendLog(`Permutation caméra -> ${state.currentCameraFacing}`);
+      await initCamera(state.currentCameraFacing);
+    }
+
+    function addSystemWarmupComments(username) {
+      injectCommentBubble("Système", `${username} vient de démarrer le live`, "hype");
+    }
+
+    function injectCommentBubble(username, text, type = "common") {
+      const feed = $("hudChatFeed");
+      if (!feed) return;
+
+      const bubble = document.createElement("div");
+      bubble.className = `comment-bubble bubble-${type}`;
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "comment-username";
+      nameSpan.textContent = sanitizeText(username, "Viewer");
+
+      const msgSpan = document.createElement("span");
+      msgSpan.textContent = sanitizeText(text, "...");
+
+      bubble.appendChild(nameSpan);
+      bubble.appendChild(msgSpan);
+      feed.appendChild(bubble);
+
+      state.activeCommentsCount += 1;
+      state.totalComments += 1;
+
+      while (state.activeCommentsCount > state.maxComments && feed.firstElementChild) {
+        feed.removeChild(feed.firstElementChild);
+        state.activeCommentsCount -= 1;
+      }
+
+      appendLog(`[CHAT:${type.toUpperCase()}] ${username}: ${text}`);
     }
 
     function startEngineLoops() {
-        commentInterval = setInterval(() => {
-            const user = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)];
-            const msg = MOCK_PHRASES[Math.floor(Math.random() * MOCK_PHRASES.length)];
-            
-            const feedContainer = document.getElementById('hudChatFeed');
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble';
-            bubble.innerHTML = `<div class="chat-bubble-name">${user}</div><div class="chat-bubble-msg">${msg}</div>`;
-            
-            feedContainer.appendChild(bubble);
-            activeBubblesCount++;
+      clearTimers();
+      scheduleCommentLoop();
+      state.statsInterval = setInterval(() => {
+        const delta = state.activityMode === "chaos" ? Math.floor(Math.random() * 13) - 3 : Math.floor(Math.random() * 5) - 2;
+        state.viewerCount = Math.max(12, state.viewerCount + delta);
+        updateStatsDisplay();
+      }, 4200);
+    }
 
-            while (activeBubblesCount > 9) {
-                feedContainer.removeChild(feedContainer.firstElementChild);
-                activeBubblesCount--;
-            }
+    function scheduleCommentLoop() {
+      clearInterval(state.commentInterval);
+      const delayMap = { slow: 5200, normal: 2800, chaos: 1200, hype: 950 };
+      const delay = delayMap[state.activityMode] || 2800;
+      state.commentInterval = setInterval(() => {
+        const type = chooseCommentType();
+        const pool = MOCK_DATA[type] || MOCK_DATA.common;
+        injectCommentBubble(randomUser(), pick(pool), type);
+      }, delay);
+      updateStatsDisplay();
+    }
 
-            appendLog(`[CHAT] ${user}: ${msg}`);
-        }, 3000);
+    function chooseCommentType() {
+      if (state.activityMode === "hype" || state.activityMode === "chaos") {
+        return weightedPick([
+          ["hype", 40], ["common", 20], ["gift", 12], ["slang", 12], ["questions", 10], ["troll_light", 6]
+        ]);
+      }
+      if (state.activityMode === "slow") {
+        return weightedPick([
+          ["common", 44], ["questions", 18], ["offtopic_life", 18], ["hype", 10], ["troll_light", 5], ["slang", 5]
+        ]);
+      }
+      return weightedPick([
+        ["common", 32], ["hype", 22], ["questions", 16], ["offtopic_life", 12], ["slang", 10], ["troll_light", 8]
+      ]);
+    }
+
+    function weightedPick(entries) {
+      const total = entries.reduce((sum, item) => sum + item[1], 0);
+      let roll = Math.random() * total;
+      for (const [value, weight] of entries) {
+        roll -= weight;
+        if (roll <= 0) return value;
+      }
+      return entries[0][0];
+    }
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function randomUser() {
+      return pick(MOCK_USERNAMES);
+    }
+
+    function updateStatsDisplay() {
+      setText("viewerCountDisplay", state.viewerCount);
+      setText("likeCountDisplay", state.totalLikes);
+      setText("metricViewers", state.viewerCount);
+      setText("metricLikes", state.totalLikes);
+      setText("metricMode", state.sessionStarted ? state.activityMode.toUpperCase() : "IDLE");
+    }
+
+    function triggerUserLike() {
+      state.totalLikes += 1;
+      state.viewerCount += Math.random() > 0.5 ? 1 : 0;
+      updateStatsDisplay();
+      spawnParticle("heart");
+      injectCommentBubble(randomUser(), pick(MOCK_DATA.hype), "hype");
+      appendLog("Action utilisateur : like envoyé.");
+      temporaryHypeMode();
+    }
+
+    function triggerGift() {
+      state.totalLikes += 5;
+      state.viewerCount += 2;
+      updateStatsDisplay();
+      spawnParticle("gift");
+      injectCommentBubble(randomUser(), pick(MOCK_DATA.gift), "gift");
+      appendLog("Action utilisateur : gift visuel envoyé.");
+      temporaryHypeMode();
+    }
+
+    function temporaryHypeMode() {
+      const previous = state.activityMode === "slow" ? "slow" : ($("cfgActivity").value || "normal");
+      state.activityMode = "hype";
+      scheduleCommentLoop();
+      clearTimeout(state.hypeTimeout);
+      state.hypeTimeout = setTimeout(() => {
+        state.activityMode = previous;
+        scheduleCommentLoop();
+      }, 6500);
+    }
+
+    function spawnParticle(kind) {
+      const space = $("particleSpace");
+      const node = document.createElement("div");
+      node.className = kind === "gift" ? "gift-particle" : "heart-particle";
+      node.textContent = kind === "gift" ? "🎁" : "❤️";
+      node.style.left = `${Math.floor(Math.random() * 62) + 20}%`;
+      if (kind === "gift") node.style.top = `${Math.floor(Math.random() * 34) + 28}%`;
+      space.appendChild(node);
+      setTimeout(() => node.remove(), 1000);
+    }
+
+    function executeUserComment() {
+      const input = $("chatInputField");
+      const value = sanitizeText(input.value, "");
+      if (!value) return;
+      injectCommentBubble("Moi", value, "common");
+      input.value = "";
+      temporaryHypeMode();
     }
 
     function appendLog(text) {
-        const logBox = document.getElementById('backofficeLog');
-        const entry = document.createElement('div');
-        entry.className = 'log-line';
-        entry.innerHTML = `<span class="tag">[SYS]</span> ${text}`;
-        logBox.appendChild(entry);
-        logBox.scrollTop = logBox.scrollHeight;
+      const logBox = $("backofficeLog");
+      if (!logBox) return;
+      const entry = document.createElement("div");
+      entry.className = "log-line";
+
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "[SYS] ";
+
+      const content = document.createElement("span");
+      content.textContent = text;
+
+      entry.appendChild(tag);
+      entry.appendChild(content);
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
     }
 
-    document.getElementById('sendLikeBtn').addEventListener('click', () => {
-        const space = document.getElementById('particleSpace');
-        const heart = document.createElement('div');
-        heart.className = 'heart-particle';
-        heart.innerHTML = '❤️';
-        heart.style.left = `${Math.floor(Math.random() * 60) + 200}px`;
-        space.appendChild(heart);
-        setTimeout(() => heart.remove(), 800);
-        appendLog("[ACTION] Like simulé généré au clic du HUD");
-    });
-</script>
+    function bindUi() {
+      ["cfgUsername", "cfgLocation", "cfgCamera", "cfgSkin", "cfgActivity", "cfgMaxComments"].forEach((id) => {
+        $(id).addEventListener("change", saveConfig);
+        $(id).addEventListener("input", saveConfig);
+      });
+
+      $("chatInputField").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") executeUserComment();
+      });
+    }
+
+    restoreConfig();
+    applySkin($("cfgSkin").value);
+    setTargetDevice(state.targetDevice);
+    bindUi();
+    updateStatsDisplay();
+  </script>
 </body>
 </html>
