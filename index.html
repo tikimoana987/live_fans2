@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation Pro (Moteur Français Complet)</title>
+    <title>Live Social - Simulation Pro (Moteur V0.3.2.16 SAFE)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -45,9 +45,7 @@
         }
         .video-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             padding: 16px;
             background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
             display: flex;
@@ -111,9 +109,61 @@
             cursor: pointer;
             z-index: 10;
             pointer-events: auto;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
         
+        /* Conteneur d'Overlay des Cadeaux calqué sur la structure Flutter GiftOverlay */
+        .gift-overlay-container {
+            position: absolute;
+            top: 130px;
+            left: 16px;
+            width: 280px;
+            z-index: 20;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .gift-card-ui {
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 204, 0, 0.65);
+            box-shadow: 0 4px 18px rgba(255, 45, 85, 0.22);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: giftIn 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards, giftOut 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) 4.2s forwards;
+            transform-origin: top left;
+        }
+        .gift-card-ui i.gift-main-icon {
+            color: #ffcc00;
+            font-size: 1.3rem;
+        }
+        .gift-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .gift-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        .gift-subtitle {
+            font-size: 0.75rem;
+            color: #ff2d55;
+            font-weight: 600;
+        }
+
+        @keyframes giftIn {
+            from { opacity: 0; transform: translate(-12px, -12px) scale(0.92); }
+            to { opacity: 1; transform: translate(0, 0) scale(1); }
+        }
+        @keyframes giftOut {
+            from { opacity: 1; transform: translate(0, 0) scale(1); }
+            to { opacity: 0; transform: translate(-12px, -6px) scale(0.85); }
+        }
+
         .interaction-area {
             background: #0f0f0f;
             flex: 1.2;
@@ -162,16 +212,14 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            scroll-behavior: smooth;
             background: #0a0a0a;
         }
         .message-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            background: rgba(26, 26, 36, 0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 14px;
+            background: rgba(26, 26, 36, 0.45);
+            border-radius: 12px;
             padding: 8px 12px;
             max-width: 95%;
             font-size: 0.85rem;
@@ -190,12 +238,10 @@
             font-size: 0.7rem;
             color: white;
             flex-shrink: 0;
-            text-transform: uppercase;
         }
         .msg-content {
             display: flex;
             flex-direction: column;
-            gap: 2px;
         }
         .username-wrapper {
             display: inline-flex;
@@ -212,18 +258,11 @@
             line-height: 1.3;
         }
         
-        .join-message {
-            background: transparent;
-            border-left: none;
-            padding: 2px 12px;
-            font-style: italic;
-            color: #8e8e93;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .gift-sys-message {
+            background: rgba(255, 204, 0, 0.1);
+            border-left: 3px solid #ffcc00;
+            color: #ffcc00;
         }
-        .join-message i { font-size: 0.7rem; color: #34c759; }
 
         .my-message {
             background: rgba(42, 157, 143, 0.15);
@@ -245,7 +284,6 @@
             padding: 12px 16px;
             border-radius: 40px;
             color: white;
-            font-size: 0.9rem;
             outline: none;
         }
         .chat-input-area button {
@@ -255,37 +293,36 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            font-size: 1.1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
-        .heart-stream-container {
+        /* Système particulaire LikeOverlay avec dérive sinusoïdale */
+        .like-overlay-space {
             position: absolute;
             right: 20px;
             bottom: 60px;
-            width: 100px;
+            width: 120px;
             height: 320px;
             pointer-events: none;
             z-index: 99;
             overflow: hidden;
         }
-        .floating-heart {
+        .floating-heart-icon {
             position: absolute;
             bottom: 0;
-            right: 25px;
+            left: 50%;
             pointer-events: none;
             opacity: 0;
-            transform: scale(0.5);
-            animation: floatUpStream 2.2s cubic-bezier(0.08, 0.74, 0.31, 1) forwards;
+            animation: particleAnimation 1.9s linear forwards;
         }
-        @keyframes floatUpStream {
-            0% { opacity: 0; transform: bottom 0px scale(0.5) translateX(0); }
-            12% { opacity: 0.95; transform: scale(1.1); }
-            85% { opacity: 0.8; }
-            100% { opacity: 0; bottom: 280px; transform: scale(1.4) translateX(var(--x-end)); }
+        @keyframes particleAnimation {
+            0% { opacity: 0; transform: translateY(0) translateX(0) scale(0.6); }
+            15% { opacity: 0.95; transform: translateY(-20px) translateX(var(--drift-1)) scale(1.1); }
+            50% { transform: translateY(-90px) translateX(var(--drift-2)) scale(1); }
+            100% { opacity: 0; transform: translateY(-180px) translateX(var(--drift-3)) scale(1.3); }
         }
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(8px); }
@@ -302,8 +339,6 @@
             justify-content: center;
             align-items: center;
             gap: 24px;
-            padding: 20px;
-            transition: opacity 0.4s ease;
         }
         .start-btn {
             background: linear-gradient(135deg, #ff3b30, #ff453a);
@@ -312,17 +347,15 @@
             padding: 16px 36px;
             border-radius: 40px;
             font-weight: bold;
-            font-size: 1.05rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
         }
     </style>
 </head>
 <body>
 
 <div class="start-overlay" id="appStartOverlay">
-    <h2>Simulation Live Intégrale (FR)</h2>
-    <button class="start-btn" id="explicitStartBtn">Lancer le direct</button>
+    <h2>Simulation Live Engine V0.3.2.16</h2>
+    <button class="start-btn" id="explicitStartBtn">Démarrer</button>
 </div>
 
 <div class="live-container">
@@ -331,15 +364,16 @@
         <div class="video-overlay">
             <div class="live-badge"><i class="fas fa-circle"></i> EN DIRECT</div>
             <div class="stats-header">
-                <span><i class="fas fa-eye"></i> <span id="viewerCount">142</span></span>
+                <span><i class="fas fa-eye"></i> <span id="viewerCount">72</span></span>
                 <span><i class="fas fa-heart"></i> <span id="likeCountDisplay">254</span></span>
             </div>
         </div>
+        <div class="gift-overlay-container" id="giftOverlayZone"></div>
         <button id="switchCameraBtn" class="camera-switch-btn"><i class="fas fa-camera"></i></button>
     </div>
 
     <div class="interaction-area">
-        <div class="heart-stream-container" id="heartStream"></div>
+        <div class="like-overlay-space" id="likeOverlaySpace"></div>
 
         <div class="reaction-toolbar">
             <div class="like-count">
@@ -359,111 +393,198 @@
 
 <script>
     (function() {
-        // Injection complète et rigoureuse de vos catalogues de contenu FR
+        // Chargement strict des bases de connaissances transmises
         const commentsDb = {
-            common: ["Salut le live","Ça rend bien","On est là","Bonne énergie","La qualité est propre","Continue comme ça","Très naturel","Je reste regarder","Ça commence bien","Premier live que je vois de toi","Je viens d'arriver, je rattrape","Bonne ambiance ce soir","Ça donne envie de rester","Belle énergie aujourd'hui","Tu gères bien","Le son est clair","On capte bien tout","Bonne soirée à toi","Je suis fan de ce format","C'est cool de te voir live","Tranquille ce live","Petit coucou en passant","Je découvre, je reste un peu","C'est apaisant à regarder","Ravi de tomber sur ce live","Toujours sympa de passer ici"],
-            hype: ["Incroyable","Trop fort","Let's go","Le live est propre","Grosse ambiance","Ça monte fort","On défonce tout ce soir","Ça part fort","Énorme","C'est de la balle","Ambiance de feu","Ça chauffe","Vous gérez tous","Le pic est énorme","C'est parti","On y croit à fond","Belle montée","Ça envoie","Niveau maximum","C'est le feu","C'est dingue cette ambiance"],
-            offtopic_life: ["Vive le PSG","Quelqu'un a vu le nouveau Pokémon ?","J'adore les pâtes carbonara","Mon chat vient de renverser mon café","Il pleut chez moi","Je mange une pizza en regardant","Allez l'OM","J'ai trop la dalle là","Mon voisin fait encore du bruit","Le café est meilleur que le thé","Je révise pendant que je regarde","Vivement le week-end","Mon téléphone est à 1% là","Je suis sous ma couette, trop bien","Mon Wifi rame un peu"],
-            questions: ["Tu fais ça depuis combien de temps ?","Tu peux montrer la config ?","C'est quoi ton setup ?","Tu réponds aux questions ?","Tu vas live combien de temps ?","Tu fais ça tous les jours ?","C'est quoi le programme aujourd'hui ?","Tu es où exactement ?","Tu utilises quel logiciel ?","Tu lis tous les messages ?","Tu utilises quel micro ?","Tu as un planning de lives ?"],
-            slang: ["Wesh ça va ou quoi","C'est clean frérot","J'suis mort de rire","Askip c'est la hype","Ça part en couille là","T'es chaud toi","Ratio","Clip ça vite","Sah c'est bien","Grave","C'est ouf","Tu gères grave","C'est validé","J'avoue c'est propre","Tranquille tranquille","C'est chill","Mood","Big up","Ça fait plaiz","T'assures","C'est lourd"],
+            common: ["Salut le live","Ça rend bien","On est là","Bonne énergie","La qualité est propre","Continue comme ça","Très naturel","Je reste regarder","Ça commence bien","Premier live que je vois de toi","Je viens d'arriver, je rattrape","Bonne ambiance ce soir","Ça donne envie de rester","Belle énergie aujourd'hui","Tu gères bien","Le son est clair","On capte bien tout","Bonne soirée à toi","Je suis fan de ce format","C'est cool de te voir live"],
+            hype: ["Incroyable","Trop fort","Let's go","Le live est propre","Grosse ambiance","Ça monte fort","On défonce tout ce soir","Ça part fort","Énorme","C'est de la balle","Ambiance de feu","Ça chauffe","Vous gérez tous","C'est le feu","C'est dingue cette ambiance"],
+            offtopic_life: ["Vive le PSG","Quelqu'un a vu le nouveau Pokémon ?","J'adore les pâtes carbonara","Mon chat vient de renverser mon café","Il pleut chez moi","Je mange une pizza en regardant","Allez l'OM","J'ai trop la dalle là","Mon voisin fait encore du bruit","Le café est meilleur que le thé","Je révise pendant que je regarde","Mon téléphone est à 1% là"],
+            questions: ["Tu fais ça depuis combien de temps ?","Tu peux montrer la config ?","C'est quoi ton setup ?","Tu réponds aux questions ?","Tu vas live combien de temps ?","Tu fais ça tous les jours ?","Tu lis tous les messages ?","Tu utilises quel micro ?","Tu as un planning de lives ?"],
+            slang: ["Wesh ça va ou quoi","C'est clean frérot","J'suis mort de rire","Askip c'est la hype","Ça part en couille là","T'es chaud toi","Ratio","Clip ça vite","Sah c'est bien","Grave","C'est ouf","Tu gères grave","C'est validé","J'avoue c'est propre","Tranquille tranquille","C'est chill","Mood","Big up","Ça fait plaiz"],
             troll_light: ["On dirait un vrai live haha","Le cadrage est serré non ?","Je bug ou ça lag un peu ?","Qui a invité le bot ?","Le cadrage est chelou là","Ok mais pourquoi personne dit rien","Je crois que ton chat a buggé","C'est moi ou ça fige un peu ?","Tout le monde dort ou quoi","C'est calme calme calme"]
         };
 
-        const prefixList = ["Alex", "Sara", "Tom", "Léna", "Max", "Lili", "Hugo", "Chloé", "Nico", "Emma"];
-        const rootList = ["_Gamer", "Vibes", "📸", "prod", "_off", ".xyz", "Design", "Fnx"];
-        const avatarColors = ["#ff2d55", "#4cd964", "#5856d6", "#ff9500", "#ffcc00", "#5ac8fa", "#007aff", "#e056fd", "#2a9d8f"];
+        // Données complètes de NicknameGenerator V0.3.2.16 SAFE
+        const specialNames = ['TikiFan','MoanaLive','BlueFox','NeoLab','PixelMan','Raven','Kai','Lina','Nova','Mika92','Sam','LocalViewer'];
+        const prefixes = ['Neo','Blue','Dark','Tiki','Nova','Pixel','Cyber','Moon','Kai','Flow','Sky','Mini','Max','Turbo','Alpha','Beta','Ghost','Wave','Star','Live','French','Paris','Island','Ocean','Rocket','Sonic','Lucky','Shadow','Vibe','Cosmo'];
+        const roots = ['Fox','Lab','Stream','Vibes','Byte','Wave','Cam','Pulse','Ghost','Motion','Crew','Studio','Zone','Mode','Pixel','Replay','Signal','Frame','Spark','Cloud','Tiger','Panda','Rider','Quest','Ninja','Wizard','Runner'];
+        const suffixes = ['','','','TV','Live','FR','Zone','Studio','Crew','Mode','Lab','Plus','X'];
+        const numbers = ['','','','13','21','27','42','75','92','987'];
+        const avatarColors = ["#ff2d55", "#4cd964", "#5856d6", "#ff9500", "#ffcc00", "#007aff", "#e056fd", "#2a9d8f"];
+        const giftList = ["une Rose", "un Cornet de Glace", "un Trophée Or", "un Véhicule de Sport", "une Couronne"];
 
-        const video = document.getElementById('liveVideo');
-        const chatDiv = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const viewerSpan = document.getElementById('viewerCount');
-        const likeDisplaySpan = document.getElementById('likeCountDisplay');
-        const totalLikesSpan = document.getElementById('totalLikesRealtime');
-        
-        let totalLikes = 254, viewerCount = 142, currentStream = null, currentFacing = 'user';
+        const recentUsernames = [];
+        let lastRootSignature = null;
+        let lastPrefixSignature = null;
+        let totalLikes = 254, viewerCount = 72, currentStream = null, currentFacing = 'user';
+        let activityMode = 'normal'; // calm, normal, viral, chaos
 
-        function generateUniqueUsername() {
-            const p = prefixList[Math.floor(Math.random() * prefixList.length)];
-            const r = rootList[Math.floor(Math.random() * rootList.length)];
-            const num = Math.random() > 0.4 ? Math.floor(Math.random() * 98 + 2) : "";
-            return `${p}${r}${num}`;
+        function generateUniqueProfile() {
+            // Algorithme de génération autonome avec gardes anti-collisions structurelles V0.3.2.16
+            let prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            let root = roots[Math.floor(Math.random() * roots.length)];
+            
+            let guard = 0;
+            while(prefix.toLowerCase() === root.toLowerCase() && guard < 8) {
+                root = roots[Math.floor(Math.random() * roots.length)];
+                guard++;
+            }
+
+            let suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+            guard = 0;
+            while((suffix.toLowerCase() === root.toLowerCase() || suffix.toLowerCase() === prefix.toLowerCase()) && guard < 8) {
+                suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                guard++;
+            }
+
+            const num = numbers[Math.floor(Math.random() * numbers.length)];
+            const rawName = `${prefix}${root}${suffix}${num}`;
+            const username = rawName.length <= 16 ? rawName : rawName.substring(0, 16);
+
+            return {
+                username: username,
+                rootSignature: root.toLowerCase(),
+                prefixSignature: prefix.toLowerCase()
+            };
+        }
+
+        function getNextUsername() {
+            // Logique séquentielle descendante de NicknameGenerator.next()
+            for (let attempt = 0; attempt < 16; attempt++) {
+                let profile = generateUniqueProfile();
+                if (recentUsernames.contains && recentUsernames.includes(profile.username)) continue;
+                if (lastRootSignature && profile.rootSignature === lastRootSignature) continue;
+                if (lastPrefixSignature && profile.prefixSignature === lastPrefixSignature) continue;
+
+                rememberProfile(profile);
+                return profile.username;
+            }
+            let fallbackProfile = generateUniqueProfile();
+            rememberProfile(fallbackProfile);
+            return fallbackProfile.username;
+        }
+
+        function rememberProfile(p) {
+            recentUsernames.push(p.username);
+            if(recentUsernames.length > 14) recentUsernames.shift();
+            lastRootSignature = p.rootSignature;
+            lastPrefixSignature = p.prefixSignature;
         }
 
         function appendMessage(username, text, type) {
-            if (type === 'join') {
-                const joinDiv = document.createElement('div');
-                joinDiv.className = 'join-message';
-                joinDiv.innerHTML = `<i class="fas fa-user-plus"></i> <span><strong>${username}</strong> a rejoint</span>`;
-                chatDiv.appendChild(joinDiv);
-            } else {
-                const msgItem = document.createElement('div');
-                msgItem.className = `message-item ${type === 'my' ? 'my-message' : ''}`;
-                
-                // Association des couleurs de bordure conformes à votre architecture Flutter
-                let borderColor = '#ffffff';
-                if (type === 'question') borderColor = '#ffb300';
-                else if (type === 'hype') borderColor = '#ff2d55';
-                else if (type === 'slang' || type === 'troll_light') borderColor = '#ff9500';
+            const msgItem = document.createElement('div');
+            msgItem.className = `message-item ${type === 'my' ? 'my-message' : ''} ${type === 'gift' ? 'gift-sys-message' : ''}`;
+            
+            let borderColor = '#3a3a4a';
+            if (type === 'question') borderColor = '#ffb300';
+            else if (type === 'hype' || type === 'gift') borderColor = '#ff2d55';
+            else if (type === 'slang' || type === 'troll_light') borderColor = '#ff9500';
+            msgItem.style.borderLeftColor = borderColor;
+            
+            const initials = username.substring(0, 2);
+            const color = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+            const isVerified = Math.random() < 0.12 && type !== 'my';
 
-                msgItem.style.borderLeftColor = borderColor;
-                
-                const initials = username.substring(0, 2);
-                const color = avatarColors[Math.floor(Math.random() * avatarColors.length)];
-                const isVerified = Math.random() < 0.15;
-
-                msgItem.innerHTML = `
-                    <div class="avatar" style="background:${color}">${initials}</div>
-                    <div class="msg-content">
-                        <span class="username-wrapper" style="color:${color}">${username} ${isVerified ? '<i class="fas fa-check-circle badge-verified"></i>' : ''}</span>
-                        <span class="msg-text">${text}</span>
-                    </div>
-                `;
-                chatDiv.appendChild(msgItem);
-            }
+            msgItem.innerHTML = `
+                <div class="avatar" style="background:${type === 'gift' ? '#ffcc00' : color}">${initials}</div>
+                <div class="msg-content">
+                    <span class="username-wrapper" style="color:${type === 'gift' ? '#ffcc00' : color}">${username} ${isVerified ? '<i class="fas fa-check-circle badge-verified"></i>' : ''}</span>
+                    <span class="msg-text">${text}</span>
+                </div>
+            `;
+            
+            const chatDiv = document.getElementById('chatMessages');
+            chatDiv.appendChild(msgItem);
             chatDiv.scrollTop = chatDiv.scrollHeight;
             while (chatDiv.children.length > 40) chatDiv.removeChild(chatDiv.firstChild);
         }
 
-        function triggerFloatingHeart() {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            const randomXEnd = Math.floor(Math.random() * 60) - 30;
-            heart.style.color = ['#ff2d55', '#ff4757', '#e056fd', '#ff9f4a'][Math.floor(Math.random() * 4)];
-            heart.style.setProperty('--x-end', `${randomXEnd}px`);
-            heart.innerHTML = '<i class="fas fa-heart"></i>';
-            document.getElementById('heartStream').appendChild(heart);
-            setTimeout(() => heart.remove(), 2200);
+        // Système d'animation de particules calqué sur LikeOverlay (sinus + translation)
+        function triggerLikeParticle() {
+            const container = document.getElementById('likeOverlaySpace');
+            const p = document.createElement('div');
+            p.className = 'floating-heart-icon';
+            p.style.color = ['#ff2d55', '#ff4757', '#e056fd', '#ff9f4a'][Math.floor(Math.random() * 4)];
+            p.style.fontSize = `${Math.floor(Math.random() * 14) + 18}px`;
+            
+            // Calcul des facteurs de dérive sinusoïdale (drift progressif)
+            const drift1 = Math.floor(Math.random() * 25) - 12;
+            const drift2 = Math.sin(0.5 * Math.PI) * 45 + (Math.random() * 20 - 10);
+            const drift3 = Math.sin(1.0 * Math.PI) * 15 + (Math.random() * 60 - 30);
+            
+            p.style.setProperty('--drift-1', `${drift1}px`);
+            p.style.setProperty('--drift-2', `${drift2}px`);
+            p.style.setProperty('--drift-3', `${drift3}px`);
+            p.style.left = `${Math.floor(Math.random() * 40) + 30}%`;
+            
+            p.innerHTML = '<i class="fas fa-heart"></i>';
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 1900);
         }
 
-        // Moteur de distribution rigoureux basé sur votre matrice de probabilités
-        function runSimulationTick() {
-            const dice = Math.random();
-            const user = generateUniqueUsername();
+        // Déclencheur visuel de l'overlay de cadeaux (GiftOverlay)
+        function triggerGiftOverlay(username, giftName) {
+            const container = document.getElementById('giftOverlayZone');
+            const card = document.createElement('div');
+            card.className = 'gift-card-ui';
+            card.innerHTML = `
+                <i class="fas fa-box-open gift-main-icon"></i>
+                <div class="gift-details">
+                    <span class="gift-title">${username} envoie ${giftName}</span>
+                    <span class="gift-subtitle">x1 Cadeau</span>
+                </div>
+            `;
+            container.appendChild(card);
+            setTimeout(() => card.remove(), 4700);
+        }
 
-            if (dice < 0.15) {
-                appendMessage(user, "", 'join');
-            } else {
-                let category = 'common';
-                const typeDice = Math.random();
-                
-                // Représentation équilibrée des 6 canaux de contenu
-                if (typeDice < 0.35) category = 'common';
-                else if (typeDice < 0.55) category = 'hype';
-                else if (typeDice < 0.70) category = 'questions';
-                else if (typeDice < 0.82) category = 'slang';
-                else if (typeDice < 0.92) category = 'offtopic_life';
-                else category = 'troll_light';
+        // Algorithme séquentiel de Tick du CommentEngine
+        function executeCommentEngineTick() {
+            let iterations = 0;
+            const roll = Math.random();
+            
+            // Évaluation du nombre de messages selon le mode d'activité configuré
+            if (activityMode === 'calm') iterations = Math.random() < 0.35 ? 1 : 0;
+            else if (activityMode === 'normal') iterations = Math.random() < 0.75 ? 1 : 0;
+            else if (activityMode === 'viral') iterations = 1 + (Math.random() < 0.45 ? 1 : 0);
+            else if (activityMode === 'chaos') iterations = 2 + Math.floor(Math.random() * 3);
 
-                const pool = commentsDb[category];
-                const text = pool[Math.floor(Math.random() * pool.length)];
-                appendMessage(user, text, category);
+            for(let i = 0; i < iterations; i++) {
+                const user = getNextUsername();
+                const typeRoll = Math.random();
+                let type = 'common';
 
-                if (category === 'hype' || Math.random() < 0.3) {
-                    totalLikes += Math.floor(Math.random() * 2) + 1;
-                    likeDisplaySpan.innerText = totalLikes;
-                    totalLikesSpan.innerText = totalLikes;
-                    triggerFloatingHeart();
+                // Distribution mathématique rigoureuse de la spécification _pickType
+                if (typeRoll < 0.12) type = 'question';
+                else if (typeRoll < 0.30) type = 'hype';
+                else if (typeRoll < 0.38) type = 'troll_light';
+                else if (typeRoll < 0.48) type = 'offtopic_life';
+                else if (typeRoll < 0.58) type = 'slang';
+                else type = 'common';
+
+                const pool = commentsDb[type];
+                const msg = pool[Math.floor(Math.random() * pool.length)];
+                appendMessage(user, msg, type);
+
+                // Déclenchement d'interactions particulaires collatérales
+                if (type === 'hype' || Math.random() < 0.2) {
+                    const pulses = Math.floor(Math.random() * 3) + 1;
+                    for(let k=0; k<pulses; k++) {
+                        setTimeout(triggerLikeParticle, k * 150);
+                        totalLikes++;
+                    }
+                    document.getElementById('likeCountDisplay').innerText = totalLikes;
+                    document.getElementById('totalLikesRealtime').innerText = totalLikes;
                 }
+            }
+
+            // Événement rare et autonome : Envoi de Cadeau (Gift Event)
+            if (Math.random() < 0.035) {
+                const structuralUser = getNextUsername();
+                const chosenGift = giftList[Math.floor(Math.random() * giftList.length)];
+                triggerGiftOverlay(structuralUser, chosenGift);
+                appendMessage(structuralUser, `a offert ${chosenGift} au diffuseur !`, 'gift');
+                activityMode = 'viral';
+                setTimeout(() => { activityMode = 'normal'; }, 8000);
             }
         }
 
@@ -471,20 +592,23 @@
             if (currentStream) currentStream.getTracks().forEach(t => t.stop());
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
-                video.srcObject = currentStream;
+                document.getElementById('liveVideo').srcObject = currentStream;
             } catch (e) {
-                console.warn("Caméra indisponible ou refusée.");
+                console.warn("Caméra inaccessible.");
             }
         }
 
         document.getElementById('explicitStartBtn').addEventListener('click', async () => {
             document.getElementById('appStartOverlay').remove();
             await initCamera('user');
-            setInterval(runSimulationTick, 2400);
+            
+            // Intervalles moteurs synchronisés
+            setInterval(executeCommentEngineTick, 1800);
             setInterval(() => {
-                viewerCount += Math.floor(Math.random() * 5) - 2;
-                viewerSpan.innerText = Math.max(10, viewerCount);
-            }, 8000);
+                const fluctuation = Math.floor(Math.random() * 5) - 2;
+                viewerCount = Math.max(15, viewerCount + fluctuation);
+                document.getElementById('viewerCount').innerText = viewerCount;
+            }, 6000);
         });
 
         document.getElementById('switchCameraBtn').addEventListener('click', async () => {
@@ -494,19 +618,23 @@
 
         document.getElementById('sendLikeBtn').addEventListener('click', () => {
             totalLikes++;
-            likeDisplaySpan.innerText = totalLikes;
-            totalLikesSpan.innerText = totalLikes;
-            triggerFloatingHeart();
+            document.getElementById('likeCountDisplay').innerText = totalLikes;
+            document.getElementById('totalLikesRealtime').innerText = totalLikes;
+            triggerLikeParticle();
+            activityMode = 'chaos';
+            clearTimeout(window.hypeTimeout);
+            window.hypeTimeout = setTimeout(() => { activityMode = 'normal'; }, 5000);
         });
 
         document.getElementById('sendMsgBtn').addEventListener('click', executeUserMessage);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeUserMessage(); });
+        document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') executeUserMessage(); });
 
         function executeUserMessage() {
-            const txt = chatInput.value.trim();
+            const input = document.getElementById('chatInput');
+            const txt = input.value.trim();
             if(!txt) return;
             appendMessage("Vous", txt, 'my');
-            chatInput.value = "";
+            input.value = "";
         }
     })();
 </script>
