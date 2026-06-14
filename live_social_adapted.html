@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Live Social - Simulation (mobile & desktop)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y; /* préserve le scroll vertical mais pas horizontal */
+        }
+        .live-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #000;
+        }
+        .video-area {
+            position: relative;
+            background: #111;
+            flex: 2;
+            min-height: 45vh;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        #liveVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #1a1a1a;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .live-badge {
+            background: #ff3b30;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+        }
+        .live-badge i {
+            font-size: 12px;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.9);}
+            100% { opacity: 1; transform: scale(1.2);}
+        }
+        .stats-header {
+            display: flex;
+            gap: 14px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            pointer-events: auto;
+        }
+        .stats-header span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .camera-switch-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(12px);
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            padding: 12px;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.2s;
+            pointer-events: auto;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        .camera-switch-btn:active {
+            transform: scale(0.94);
+        }
+        .interaction-area {
+            background: #0f0f0f;
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #2a2a2a;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.4);
+        }
+        .reaction-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: #161616;
+            border-bottom: 1px solid #2c2c2c;
+        }
+        .like-count {
+            background: #1e1e2f;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .like-count i {
+            color: #ff2d55;
+            font-size: 1.2rem;
+        }
+        .btn-like {
+            background: linear-gradient(135deg, #ff2d55, #ff4757);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(255,45,85,0.3);
+        }
+        .btn-like:active {
+            transform: scale(0.96);
+        }
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+            background: #0a0a0a;
+        }
+        .message-item {
+            background: rgba(30,30,40,0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 8px 14px;
+            max-width: 90%;
+            font-size: 0.85rem;
+            animation: fadeSlideUp 0.2s ease;
+            border-left: 3px solid #ff3b30;
+            word-break: break-word;
+        }
+        .message-item strong {
+            color: #ff9f4a;
+            margin-right: 6px;
+        }
+        .system-message {
+            background: rgba(255,75,45,0.15);
+            border-left-color: #ff9f4a;
+            font-style: italic;
+        }
+        .my-message {
+            background: #2c2c3a;
+            align-self: flex-end;
+            border-left-color: #2a9d8f;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 10px 14px;
+            background: #121212;
+            gap: 10px;
+            border-top: 1px solid #2a2a2a;
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: #202020;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 40px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .chat-input-area button {
+            background: #ff3b30;
+            border: none;
+            color: white;
+            width: 46px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .heart-animation {
+            position: fixed;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: 200;
+            animation: floatUp 1s ease-out forwards;
+            color: #ff2d55;
+            text-shadow: 0 0 6px rgba(255,0,0,0.5);
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-100px) scale(1.5);
+            }
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .chat-window::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-window::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        .chat-window::-webkit-scrollbar-thumb {
+            background: #ff3b30;
+            border-radius: 10px;
+        }
+        .retry-camera {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: #ff3b30;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 15;
+            pointer-events: auto;
+            box-shadow: 0 2px 10px black;
+        }
+        /* Style de l'overlay de démarrage obligatoire */
+        .start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0d0d11;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            transition: opacity 0.4s ease;
+        }
+        .start-overlay h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+        }
+        .start-overlay p {
+            font-size: 0.85rem;
+            color: #aaa;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.4;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, #ff3b30, #ff453a);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s;
+        }
+        .start-btn:active {
+            transform: scale(0.96);
+        }
+        @media (max-width: 700px) {
+            .video-area {
+                min-height: 40vh;
+            }
+            .stats-header span {
+                font-size: 0.7rem;
+            }
+            .btn-like {
+                padding: 8px 18px;
+            }
+            .camera-switch-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+                bottom: 12px;
+                right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Écran d'accueil pour forcer l'interaction utilisateur exigée par Safari iOS -->
+<div class="start-overlay" id="appStartOverlay">
+    <h2>Simulation de Live Video</h2>
+    <p>Pour activer l'appareil photo et lever les restrictions Safari (User Gesture), veuillez cliquer sur le bouton.</p>
+    <button class="start-btn" id="explicitStartBtn">
+        <i class="fas fa-video"></i> Lancer le Live
+    </button>
+</div>
+
+<div class="live-container">
+    <div class="video-area">
+        <video id="liveVideo" autoplay playsinline muted></video>
+        <div class="video-overlay">
+            <div class="live-badge">
+                <i class="fas fa-circle"></i> EN DIRECT
+            </div>
+            <div class="stats-header">
+                <span><i class="fas fa-eye"></i> <span id="viewerCount">187</span></span>
+                <span><i class="fas fa-heart"></i> <span id="likeCountDisplay">342</span></span>
+            </div>
+        </div>
+        <button id="switchCameraBtn" class="camera-switch-btn" title="Basculer caméra avant/arrière">
+            <i class="fas fa-camera-retro"></i>
+        </button>
+    </div>
+
+    <div class="interaction-area">
+        <div class="reaction-toolbar">
+            <div class="like-count">
+                <i class="fas fa-heart"></i> <span id="totalLikesRealtime">342</span> likes
+            </div>
+            <button id="sendLikeBtn" class="btn-like">
+                <i class="fas fa-heart"></i> J'aime
+            </button>
+        </div>
+
+        <div class="chat-window" id="chatMessages">
+            <div class="message-item system-message">
+                <strong>🤖 Live Social</strong> Simulation de direct, réagissez !
+            </div>
+            <div class="message-item system-message">
+                <strong>📸</strong> Caméra active (protocole HTTPS requis sur smartphone).
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Écris un message..." autocomplete="off">
+            <button id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Éléments DOM
+        const video = document.getElementById('liveVideo');
+        const switchBtn = document.getElementById('switchCameraBtn');
+        const likeBtn = document.getElementById('sendLikeBtn');
+        const chatDiv = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendMsgBtn');
+        const viewerSpan = document.getElementById('viewerCount');
+        const likeDisplaySpan = document.getElementById('likeCountDisplay');
+        const totalLikesSpan = document.getElementById('totalLikesRealtime');
+        const startOverlay = document.getElementById('appStartOverlay');
+        const explicitStartBtn = document.getElementById('explicitStartBtn');
+        
+        // Variables d'état
+        let currentStream = null;
+        let currentFacing = 'user';     // 'user' = avant, 'environment' = arrière
+        let cameraActive = false;
+        let totalLikes = 342;
+        let viewerCount = 187;
+        let spectatorInterval = null;
+        let viewerInterval = null;
+        let isSwitching = false;
+        
+        // Helper : ajouter un message au chat
+        function addChatMessage(username, text, isSystem = false, isOwn = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message-item');
+            if (isSystem) msgDiv.classList.add('system-message');
+            if (isOwn) msgDiv.classList.add('my-message');
+            const strong = document.createElement('strong');
+            strong.textContent = username + ' ';
+            msgDiv.appendChild(strong);
+            msgDiv.appendChild(document.createTextNode(text));
+            chatDiv.appendChild(msgDiv);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            while (chatDiv.children.length > 120) chatDiv.removeChild(chatDiv.firstChild);
+        }
+        
+        // Cœur flottant
+        function showHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-animation';
+            heart.innerHTML = '❤️';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+        
+        function updateLikesUI() {
+            likeDisplaySpan.innerText = totalLikes;
+            totalLikesSpan.innerText = totalLikes;
+        }
+        
+        function addLikes(amount = 1, animate = true) {
+            totalLikes += amount;
+            if (totalLikes < 0) totalLikes = 0;
+            updateLikesUI();
+            if (animate) showHeart();
+        }
+        
+        // ---------- SIMULATION SPECTATEURS ----------
+        function randomSpectatorLike() {
+            addLikes(1, true);
+            if (Math.random() < 0.35) {
+                const names = ["🌸 Lili", "🔥 Max", "👾 GamerX", "✨ Sophie", "🎸 Rocker", "📸 Lens", "🎧 DJ_Flo", "❤️ Julie"];
+                const name = names[Math.floor(Math.random() * names.length)];
+                const msgs = ["❤️ j'adore!", "Super live!", "👍👍👍", "🔥🔥", "incroyable", "🎉 top", "😍 magnifique"];
+                const msg = msgs[Math.floor(Math.random() * msgs.length)];
+                addChatMessage(name, msg, false, false);
+            }
+        }
+        
+        function randomSpectatorComment() {
+            const fakeNames = ["Marie_92", "TonioLive", "PixelWarrior", "ClaraStyle", "Jules_Vibes", "LensFan", "Nina_Buzz", "Alex_Drone"];
+            const messages = ["Excellent live !", "👏👏 bravo", "Trop drôle", "Encore!!", "Super ambiance", "Vive le direct", "🎶🎶", "Tu gères!", "👍 from Paris", "🔥 ça chauffe", "Belle caméra !"];
+            const randomName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            addChatMessage(randomName, randomMsg, false, false);
+            if (Math.random() < 0.5) addLikes(1, true);
+        }
+        
+        function updateViewers() {
+            const variation = Math.floor(Math.random() * 7) - 2;
+            let newCount = viewerCount + variation;
+            if (newCount < 45) newCount = 45;
+            if (newCount > 1200) newCount = 1100;
+            viewerCount = newCount;
+            viewerSpan.innerText = viewerCount;
+            if (variation > 2 && Math.random() < 0.3) {
+                addChatMessage("🔔 Live", `+${variation} nouveaux spectateurs !`, true, false);
+            }
+        }
+        
+        function startSimulation() {
+            if (spectatorInterval) clearInterval(spectatorInterval);
+            if (viewerInterval) clearInterval(viewerInterval);
+            spectatorInterval = setInterval(() => {
+                if (Math.random() < 0.6) randomSpectatorComment();
+                else randomSpectatorLike();
+            }, 7000);
+            viewerInterval = setInterval(() => {
+                updateViewers();
+            }, 13000);
+        }
+        
+        async function stopAndCleanStream() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => {
+                    if (track.readyState === 'live') track.stop();
+                });
+                currentStream = null;
+            }
+            video.srcObject = null;
+        }
+        
+        async function initCamera(facingMode) {
+            if (isSwitching) return false;
+            isSwitching = true;
+            
+            await stopAndCleanStream();
+            
+            try {
+                let stream;
+                try {
+                    const constraints = {
+                        video: { facingMode: { exact: facingMode } },
+                        audio: false
+                    };
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (exactError) {
+                    console.warn("Exact facingMode failed, trying generic video constraint", exactError);
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                }
+                
+                if (stream) {
+                    currentStream = stream;
+                    video.srcObject = stream;
+                    cameraActive = true;
+                    
+                    const oldRetry = document.querySelector('.retry-camera');
+                    if (oldRetry) oldRetry.remove();
+                    isSwitching = false;
+                    return true;
+                } else {
+                    throw new Error("No stream obtained");
+                }
+            } catch (err) {
+                console.error("Erreur caméra :", err);
+                cameraActive = false;
+                let errorText = "Impossible d'accéder à la caméra.";
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    errorText = "Permission refusée. Autorisez la caméra dans vos paramètres.";
+                }
+                addChatMessage("📹 ERREUR", errorText, true, false);
+                
+                let retryBtn = document.querySelector('.retry-camera');
+                if (!retryBtn) {
+                    retryBtn = document.createElement('button');
+                    retryBtn.className = 'retry-camera';
+                    retryBtn.innerHTML = '<i class="fas fa-camera"></i> Réessayer caméra';
+                    retryBtn.onclick = async () => {
+                        retryBtn.remove();
+                        await initCamera(currentFacing);
+                    };
+                    video.parentElement.appendChild(retryBtn);
+                }
+                isSwitching = false;
+                return false;
+            }
+        }
+        
+        async function toggleCamera() {
+            if (isSwitching) return;
+            const newFacing = currentFacing === 'user' ? 'environment' : 'user';
+            currentFacing = newFacing;
+            const success = await initCamera(currentFacing);
+            if (success) {
+                const msg = currentFacing === 'environment' ? '📱 Caméra ARRIÈRE activée' : '🤳 Caméra AVANT activée';
+                addChatMessage("🎥 SYSTÈME", msg, true, false);
+            } else {
+                currentFacing = currentFacing === 'user' ? 'environment' : 'user';
+            }
+        }
+        
+        function userLikeReaction() {
+            addLikes(1, true);
+            addChatMessage("Vous", "❤️ a aimé le live !", false, true);
+        }
+        
+        function sendMessage() {
+            const msg = chatInput.value.trim();
+            if (msg === "") return;
+            addChatMessage("Vous", msg, false, true);
+            chatInput.value = "";
+        }
+        
+        video.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            userLikeReaction();
+        });
+        
+        // Initialisation déclenchée uniquement par l'action sur le bouton d'accueil (requis par Safari)
+        explicitStartBtn.addEventListener('click', async () => {
+            startSimulation();
+            updateLikesUI();
+            viewerSpan.innerText = viewerCount;
+            
+            const cameraStarted = await initCamera('user');
+            if (!cameraStarted) {
+                addChatMessage("📌", "Mode dégradé sans flux vidéo. Vérifiez que vous utilisez bien HTTPS.", true, false);
+            } else {
+                addChatMessage("🎥", "Flux vidéo synchronisé avec succès.", true, false);
+            }
+            
+            // Retrait fluide de l'overlay
+            startOverlay.style.opacity = '0';
+            setTimeout(() => startOverlay.remove(), 400);
+        });
+        
+        // Événements
+        switchBtn.addEventListener('click', toggleCamera);
+        likeBtn.addEventListener('click', userLikeReaction);
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        window.addEventListener('beforeunload', () => {
+            if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+            if (spectatorInterval) clearInterval(spectatorInterval);
+            if (viewerInterval) clearInterval(viewerInterval);
+        });
+    })();
+</script>
+</body>
+</html>
