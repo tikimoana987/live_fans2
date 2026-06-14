@@ -3,39 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation Pro (Moteur V0.3.2.16 SAFE - Unifié)</title>
+    <title>Live Social - Simulation Pro (Moteur V0.3.2.17 SAFE)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #0a0a0a;
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
-            touch-action: pan-y;
-        }
-        .live-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #000;
-            position: relative;
-        }
-        @media (min-width: 992px) {
-            .live-container {
-                flex-direction: row;
-            }
-        }
-
-        /* --- SYSTÈME DE THÉMATISATION DYNAMIQUE (LiveSkin Mapping) --- */
+        /* --- DESIGN SYSTEM & CSS TOKENS (LiveSkin Mapping) --- */
         :root {
             --primary-color: #00bcd4;
             --secondary-color: #e91e63;
@@ -46,20 +17,143 @@
             --gradient-end: #020c1b;
         }
 
-        /* --- ZONE APPAREIL / APERÇU LIVE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        /* --- MODE SELECTOR SCREEN (ÉCRAN D'ACCUEIL OBLIGATOIRE) --- */
+        .mode-selector-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0d0e12;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .mode-selector-screen h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #00bcd4, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .mode-selector-screen p {
+            font-size: 14px;
+            color: #8e8e93;
+            margin-bottom: 32px;
+            max-width: 320px;
+        }
+        .selector-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 280px;
+        }
+        .mode-btn {
+            background: #1c1c1e;
+            border: 2px solid #232326;
+            border-radius: 14px;
+            padding: 18px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .mode-btn i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        .mode-btn div {
+            display: flex;
+            flex-direction: column;
+        }
+        .mode-btn span.title {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .mode-btn span.desc {
+            font-size: 11px;
+            color: #8e8e93;
+            margin-top: 2px;
+        }
+        .mode-btn:active, .mode-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 188, 212, 0.05);
+        }
+
+        /* --- CONTENEUR PRINCIPAL DE L'APPLICATION --- */
+        .live-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #000;
+            position: relative;
+        }
+
+        /* --- CONFIGURATION ORDINATEUR PAR DÉFAUT --- */
+        @media (min-width: 992px) {
+            .live-container.layout-computer {
+                flex-direction: row;
+            }
+            .live-container.layout-computer .video-area {
+                flex: 1.4;
+                height: 100vh;
+            }
+            .live-container.layout-computer .control-panel {
+                flex: 1;
+                height: 100vh;
+                display: flex !important;
+                border-top: none;
+                border-left: 1px solid #232326;
+            }
+        }
+
+        /* --- MODE SMARTPHONE CIBLÉ (FORCE FULLSCREEN OVERLAY) --- */
+        .live-container.layout-smartphone .video-area {
+            width: 100vw;
+            height: 100vh;
+            flex: none;
+            min-height: 100vh;
+        }
+        .live-container.layout-smartphone .control-panel {
+            display: none !important; /* Cache complètement les menus de contrôle */
+        }
+
+        /* --- ZONE RENDU IMAGE / VIDÉO LIVE --- */
         .video-area {
             position: relative;
             background: #111;
             flex: 2;
-            min-height: 48vh;
+            min-height: 100vh;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        }
-        @media (min-width: 992px) {
-            .video-area {
-                flex: 1.4;
-                height: 100vh;
-            }
         }
         .camera-preview {
             width: 100%;
@@ -69,7 +163,7 @@
             transform: scaleX(-1);
         }
 
-        /* --- GRAPHIC OVERLAY CONTENU HUD --- */
+        /* --- COUCHE OVERLAY GRAPHIQUE HUD --- */
         .hud-overlay {
             position: absolute;
             top: 0;
@@ -81,7 +175,7 @@
             flex-direction: column;
             justify-content: space-between;
             pointer-events: none;
-            padding: max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) 12px;
+            padding: max(12px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)) 12px;
         }
         .hud-overlay * {
             pointer-events: auto;
@@ -149,10 +243,10 @@
             letter-spacing: 0.5px;
         }
         
-        /* VIEWER COUNTER (Fidélité Dart Strict) */
+        /* VIEWER COUNTER */
         .badge-viewers {
             background: rgba(0, 0, 0, 0.38);
-            border: 1px solid rgba(255, 255, 255, 0.25); /* Mis à jour dynamiquement avec opacité 0.55 en JS */
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: #fff;
             font-size: 12px;
             font-weight: 700;
@@ -163,13 +257,13 @@
             gap: 6px;
         }
 
-        /* COMMENT FEED CONTAINER (Fidélité Alignement et Largeur Canonique) */
+        /* COMMENT FEED CONTAINER (Seuil strict 9 messages) */
         .hud-chat-container {
             position: absolute;
             bottom: 78px;
             left: 12px;
             width: 320px;
-            max-height: 320px;
+            max-height: 340px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -178,7 +272,7 @@
             pointer-events: none;
         }
         
-        /* COMMENT BUBBLE (Fidélité Absolue Dart) */
+        /* COMMENT BUBBLE Issu du switch-case Dart */
         .chat-bubble {
             background: rgba(0, 0, 0, calc(var(--panel-opacity) * 0.82));
             border-radius: var(--panel-radius);
@@ -203,11 +297,9 @@
             white-space: normal;
         }
 
-        /* Variations de bordures issues du switch-case Dart */
         .bubble-type-question { border-color: rgba(255, 193, 7, 0.35) !important; }
         .bubble-type-troll, .bubble-type-slang { border-color: rgba(255, 171, 64, 0.35) !important; }
         .bubble-type-common, .bubble-type-offtopic { border-color: rgba(255, 255, 255, 0.35) !important; }
-        /* Les types hype/reaction/gift prennent var(--primary-color) avec opacité via JS */
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(8px); }
@@ -251,21 +343,13 @@
             transform: scale(0.9);
         }
 
-        /* --- ZONE PANNEAU CONTROL & MANAGEMENT --- */
+        /* --- ZONE PANNEAU CONTROL & MANAGEMENT (COMPUTER MODE) --- */
         .control-panel {
-            flex: 1;
             background: #141416;
             border-top: 1px solid #232326;
             display: flex;
             flex-direction: column;
-            height: 52vh;
-        }
-        @media (min-width: 992px) {
-            .control-panel {
-                height: 100vh;
-                border-top: none;
-                border-left: 1px solid #232326;
-            }
+            height: 45vh;
         }
         .panel-tabs {
             display: flex;
@@ -327,7 +411,7 @@
         }
         .skin-grid {
             display: grid;
-            grid-template-columns: repeat(3, 110px);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
         }
         .skin-card {
@@ -349,7 +433,6 @@
             margin: 0 auto 8px auto;
         }
 
-        /* ENGINE STATUS CARDS */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -374,12 +457,11 @@
             color: #8e8e93;
         }
 
-        /* BACKOFFICE LIVE CHAT MONITOR */
         .backoffice-chat-log {
             background: #0b0b0c;
             border: 1px solid #232326;
             border-radius: 8px;
-            height: 180px;
+            height: 140px;
             overflow-y: auto;
             padding: 8px;
             font-family: monospace;
@@ -394,7 +476,6 @@
             font-weight: bold;
         }
 
-        /* COEUR PARTICLE FLOATING EFFECT */
         .heart-particle {
             position: absolute;
             bottom: 80px;
@@ -412,9 +493,32 @@
 </head>
 <body>
 
-<div class="live-container">
+<div class="mode-selector-screen" id="modeSelector">
+    <h1>LIVE SIMULATOR LAB</h1>
+    <p>Choisissez le mode d'affichage adapté à votre appareil actuel pour lancer la session.</p>
     
-    <div class="video-area">
+    <div class="selector-buttons">
+        <button class="mode-btn" onclick="selectEnvironment('smartphone')">
+            <i class="fas fa-mobile-alt"></i>
+            <div>
+                <span class="title">SMARTPHONE</span>
+                <span class="desc">Plein écran immersif, menus masqués.</span>
+            </div>
+        </button>
+        
+        <button class="mode-btn" onclick="selectEnvironment('computer')">
+            <i class="fas fa-desktop"></i>
+            <div>
+                <span class="title">COMPUTER</span>
+                <span class="desc">Interface complète avec panneau latéral.</span>
+            </div>
+        </button>
+    </div>
+</div>
+
+<div class="live-container layout-computer" id="mainContainer">
+    
+    <div class="video-area" id="videoArea">
         <video class="camera-preview" id="webcamSrc" autoplay playsinline muted></video>
         <div id="particleSpace"></div>
 
@@ -446,7 +550,7 @@
         </div>
     </div>
 
-    <div class="control-panel">
+    <div class="control-panel" id="controlPanel">
         <nav class="panel-tabs">
             <button class="tab-btn active" data-target="tabConfig">Configuration</button>
             <button class="tab-btn" data-target="tabEngine">Moteur de flux</button>
@@ -518,8 +622,28 @@
 </div>
 
 <script>
+    /* --- FONCTION DE SÉLECTION D'ENVIRONNEMENT & PLEIN ÉCRAN FORCÉ --- */
+    function selectEnvironment(mode) {
+        const container = document.getElementById('mainContainer');
+        const selector = document.getElementById('modeSelector');
+        
+        if (mode === 'smartphone') {
+            container.className = "live-container layout-smartphone";
+            
+            // Essayer d'activer le plein écran natif de l'appareil (nécessite un clic utilisateur)
+            const docEl = document.documentElement;
+            if (docEl.requestFullscreen) docEl.requestFullscreen();
+            else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+            else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+        } else {
+            container.className = "live-container layout-computer";
+        }
+        
+        // Retirer l'écran de sélection
+        selector.style.display = 'none';
+    }
+
     (function() {
-        /* --- SYSTÈME DE DONNÉES ET CONFIGURATION DES SKINS --- */
         const SKIN_REPOSITORY = {
             'blueSocial': {
                 primary: '#00bcd4', secondary: '#e91e63',
@@ -543,9 +667,8 @@
         let totalLikes = 0;
         let currentFacing = 'user';
         let localStream = null;
-        let activeBubblesCount = 0; // Suivi pour seuil strict de 9 messages
+        let activeBubblesCount = 0;
 
-        /* --- SYSTÈME DE DISTRIBUTION ET TYPES DE MESSAGES (Dart Type Sync) --- */
         const COMMENT_TYPES = ['common', 'question', 'hype', 'reaction', 'giftReaction', 'lightTroll', 'offtopicLife', 'slang'];
         const MOCK_USERNAMES = ['Alex_92', 'Lara_Croft', 'Dorian_G', 'Kev_Web', 'Sophie.Tech', 'AlphaRoméo', 'User9482', 'GamerPro', 'Chloee_Star', 'Max_Power'];
         const MOCK_PHRASES = [
@@ -560,33 +683,27 @@
             "Grosse ambiance ici !"
         ];
 
-        /* --- INITIALISATION DE L'INTERFACE --- */
         document.addEventListener('DOMContentLoaded', () => {
             setupTabs();
             setupConfigListeners();
             applySkin(currentSkinId);
             syncProfileHUD();
             initCamera(currentFacing);
-
-            // Boucles d'animation autonomes
             startSimulationEngine();
         });
 
-        /* --- NAVIGATION DES ONGLETS CONTROLES --- */
         function setupTabs() {
             const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabs.forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                    
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.target).classList.add('active');
                 });
             });
         }
 
-        /* --- ÉCOUTEURS DES CHANGEMENTS DE CONFIGURATION --- */
         function setupConfigListeners() {
             document.getElementById('cfgUsername').addEventListener('input', syncProfileHUD);
             document.getElementById('cfgLocation').addEventListener('input', syncProfileHUD);
@@ -616,7 +733,6 @@
             document.getElementById('hudAvatar').innerText = username.charAt(0).toUpperCase();
         }
 
-        /* --- TRANSFORMATION DYNAMIQUE DE PEAU (CSS Injector & Dart Opacity Rules) --- */
         function applySkin(skinId) {
             const skin = SKIN_REPOSITORY[skinId] || SKIN_REPOSITORY['blueSocial'];
             const root = document.documentElement;
@@ -629,14 +745,10 @@
             root.style.setProperty('--panel-radius', skin.panelRadius);
             root.style.setProperty('--button-radius', skin.buttonRadius);
 
-            // Couplage d'opacité stricte selon la configuration ViewerCounter (.withOpacity(0.55))
             document.getElementById('hudViewerBadge').style.borderColor = `${skin.primary}8C`;
-            
-            // Notification visuelle dans le backoffice
             appendLogSystem(`Skin permuté avec succès : [${skinId}]`);
         }
 
-        /* --- PREVIEW CAMÉRA MATÉRIELLE (CameraPreviewLayer) --- */
         async function initCamera(facing) {
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
@@ -660,16 +772,14 @@
                 videoElement.srcObject = localStream;
             } catch (err) {
                 console.warn("Accès caméra refusé ou indisponible : ", err);
-                videoElement.style.display = 'none'; // Repli automatique vers le dégradé CSS
+                videoElement.style.display = 'none';
             }
         }
 
-        /* --- MOTEUR APPORT CHAT CONSTANT & SUPPRESSION STRICTE (CommentFeed Limiter) --- */
         function appendMessage(username, message, type = 'common') {
             const feedContainer = document.getElementById('hudChatFeed');
-            
             const bubble = document.createElement('div');
-            // Cartographie structurelle des classes css de bordure issues du switch Dart
+            
             let dartTypeClass = 'bubble-type-common';
             if (type === 'question') dartTypeClass = 'bubble-type-question';
             else if (type === 'lightTroll') dartTypeClass = 'bubble-type-troll';
@@ -678,12 +788,10 @@
             
             bubble.className = `chat-bubble ${dartTypeClass}`;
 
-            // Traitement spécifique inline pour injecter skin.primary sur les types d'engagement
             if (['hype', 'reaction', 'giftReaction'].includes(type)) {
                 bubble.style.borderColor = `var(--primary-color)`;
             }
 
-            // Injection du RichText Structure
             bubble.innerHTML = `
                 <div class="chat-bubble-name">${username}</div>
                 <div class="chat-bubble-msg">${message}</div>
@@ -692,7 +800,7 @@
             feedContainer.appendChild(bubble);
             activeBubblesCount++;
 
-            /* --- RÈGLE D'OR DART CONFORME : MAX 9 BULLES DANS LE DOM --- */
+            /* RÈGLE STRICT DART : TRONQUER À 9 BULLES MAX */
             while (activeBubblesCount > 9) {
                 const oldestBubble = feedContainer.firstElementChild;
                 if (oldestBubble) {
@@ -701,17 +809,13 @@
                 }
             }
 
-            // Synchro simultanée dans la console technique
             appendLogBackoffice(username, message, type);
         }
 
-        /* --- LOGIQUE DE SIMULATION AUTONOME (Génération d'audience) --- */
         function startSimulationEngine() {
-            // Mise à jour de l'affichage initial du compteur
             document.getElementById('viewerCount').innerText = viewerCount;
             document.getElementById('totalViewersRealtime').innerText = viewerCount;
 
-            // Fluctuation naturelle d'audience
             setInterval(() => {
                 const diff = Math.floor(Math.random() * 5) - 2;
                 viewerCount = Math.max(12, viewerCount + diff);
@@ -719,7 +823,6 @@
                 document.getElementById('totalViewersRealtime').innerText = viewerCount;
             }, 5000);
 
-            // Génération automatisée régulière de commentaires simulés
             setInterval(() => {
                 const randomUser = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)];
                 const randomMsg = MOCK_PHRASES[Math.floor(Math.random() * MOCK_PHRASES.length)];
@@ -729,9 +832,9 @@
             }, 3800);
         }
 
-        /* --- CONSOLE LOGGERS (Backoffice Monitor) --- */
         function appendLogBackoffice(user, msg, type) {
             const logBox = document.getElementById('backofficeLog');
+            if (!logBox) return;
             const entry = document.createElement('div');
             entry.className = 'log-line';
             entry.innerHTML = `[${type.toUpperCase()}] <span class="tag">${user}:</span> ${msg}`;
@@ -741,6 +844,7 @@
 
         function appendLogSystem(text) {
             const logBox = document.getElementById('backofficeLog');
+            if (!logBox) return;
             const entry = document.createElement('div');
             entry.className = 'log-line';
             entry.style.color = '#5cb85c';
@@ -749,21 +853,18 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        /* --- INTERACTION BOUTONS ET EFFETS VISUELS --- */
         document.getElementById('sendLikeBtn').addEventListener('click', () => {
             totalLikes++;
             document.getElementById('totalLikesRealtime').innerText = totalLikes;
             
-            // Particule de coeur flottante
             const particleSpace = document.getElementById('particleSpace');
             const heart = document.createElement('div');
             heart.className = 'heart-particle';
             heart.innerHTML = '❤️';
-            heart.style.left = `${Math.floor(Math.random() * 60) + 280}px`;
+            heart.style.left = `${Math.floor(Math.random() * 60) + 200}px`;
             particleSpace.appendChild(heart);
             
             setTimeout(() => heart.remove(), 800);
-            
             appendMessage("Moi", "a aimé le live ! 💖", "hype");
         });
 
@@ -775,15 +876,12 @@
             const input = document.getElementById('chatInput');
             const val = input.value.trim();
             if (!val) return;
-            
             appendMessage("Moi", val, "common");
             input.value = '';
         });
 
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('sendMsgBtn').click();
-            }
+            if (e.key === 'Enter') document.getElementById('sendMsgBtn').click();
         });
     })();
 </script>
