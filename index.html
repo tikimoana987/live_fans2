@@ -19,10 +19,12 @@
             overflow: hidden;
             touch-action: pan-y;
         }
+        /* Style pour s'assurer que le conteneur prend tout l'écran en mode Fullscreen */
         .live-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            width: 100vw;
             max-width: 1400px;
             margin: 0 auto;
             background: #000;
@@ -344,13 +346,13 @@
 
 <div class="start-overlay" id="appStartOverlay">
     <h2>Simulation de Live Video</h2>
-    <p>Pour activer l'appareil photo et lever les restrictions de sécurité de Safari, veuillez cliquer sur le bouton.</p>
+    <p>Pour activer le mode plein écran natif et configurer votre flux vidéo, veuillez cliquer sur le bouton.</p>
     <button class="start-btn" id="explicitStartBtn">
-        <i class="fas fa-video"></i> Lancer le Live
+        <i class="fas fa-expand"></i> Lancer le Live
     </button>
 </div>
 
-<div class="live-container">
+<div class="live-container" id="mainAppContainer">
     <div class="video-area">
         <video id="liveVideo" autoplay playsinline muted></video>
         <div class="video-overlay">
@@ -379,10 +381,7 @@
 
         <div class="chat-window" id="chatMessages">
             <div class="message-item system-message">
-                <strong>🤖 Live Social</strong> Simulation de direct, réagissez !
-            </div>
-            <div class="message-item system-message">
-                <strong>📸</strong> Appareil photo actif (sécurisé via HTTPS GitHub Pages).
+                <strong>🤖 Live Social</strong> Simulation en plein écran lancée.
             </div>
         </div>
 
@@ -406,6 +405,7 @@
         const totalLikesSpan = document.getElementById('totalLikesRealtime');
         const startOverlay = document.getElementById('appStartOverlay');
         const explicitStartBtn = document.getElementById('explicitStartBtn');
+        const mainContainer = document.getElementById('mainAppContainer');
         
         let currentStream = null;
         let currentFacing = 'user'; 
@@ -416,6 +416,17 @@
         let viewerInterval = null;
         let isSwitching = false;
         
+        // Fonction pour forcer l'immersion plein écran (masque la barre d'adresse)
+        function requestFullscreenMode(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) { /* Safari / iOS */
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
         function addChatMessage(username, text, isSystem = false, isOwn = false) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message-item');
@@ -585,16 +596,19 @@
             userLikeReaction();
         });
         
+        // Clic sur le bouton de démarrage : active le Fullscreen + caméra simultanément
         explicitStartBtn.addEventListener('click', async () => {
+            // 1. Passage immédiat en plein écran (lève la barre d'adresse)
+            requestFullscreenMode(document.documentElement);
+            
+            // 2. Initialisation du reste de l'application
             startSimulation();
             updateLikesUI();
             viewerSpan.innerText = viewerCount;
             
             const cameraStarted = await initCamera('user');
             if (!cameraStarted) {
-                addChatMessage("📌", "Mode texte uniquement. Vérifiez les autorisations de votre navigateur.", true, false);
-            } else {
-                addChatMessage("🎥", "Flux caméra synchronisé avec succès.", true, false);
+                addChatMessage("📌", "Mode texte uniquement. Vérifiez vos autorisations.");
             }
             
             startOverlay.style.opacity = '0';
