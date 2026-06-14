@@ -17,7 +17,7 @@
             color: #fff;
             height: 100vh;
             overflow: hidden;
-            touch-action: pan-y; /* préserve le scroll vertical mais pas horizontal */
+            touch-action: pan-y;
         }
         .live-container {
             display: flex;
@@ -249,14 +249,8 @@
             }
         }
         @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .chat-window::-webkit-scrollbar {
             width: 4px;
@@ -311,7 +305,7 @@
             font-size: 0.85rem;
             color: #aaa;
             text-align: center;
-            max-width: 280px;
+            max-width: 290px;
             line-height: 1.4;
         }
         .start-btn {
@@ -333,15 +327,9 @@
             transform: scale(0.96);
         }
         @media (max-width: 700px) {
-            .video-area {
-                min-height: 40vh;
-            }
-            .stats-header span {
-                font-size: 0.7rem;
-            }
-            .btn-like {
-                padding: 8px 18px;
-            }
+            .video-area { min-height: 40vh; }
+            .stats-header span { font-size: 0.7rem; }
+            .btn-like { padding: 8px 18px; }
             .camera-switch-btn {
                 width: 44px;
                 height: 44px;
@@ -354,10 +342,9 @@
 </head>
 <body>
 
-<!-- Écran d'accueil pour forcer l'interaction utilisateur exigée par Safari iOS -->
 <div class="start-overlay" id="appStartOverlay">
     <h2>Simulation de Live Video</h2>
-    <p>Pour activer l'appareil photo et lever les restrictions Safari (User Gesture), veuillez cliquer sur le bouton.</p>
+    <p>Pour activer l'appareil photo et lever les restrictions de sécurité de Safari, veuillez cliquer sur le bouton.</p>
     <button class="start-btn" id="explicitStartBtn">
         <i class="fas fa-video"></i> Lancer le Live
     </button>
@@ -395,7 +382,7 @@
                 <strong>🤖 Live Social</strong> Simulation de direct, réagissez !
             </div>
             <div class="message-item system-message">
-                <strong>📸</strong> Caméra active (protocole HTTPS requis sur smartphone).
+                <strong>📸</strong> Appareil photo actif (sécurisé via HTTPS GitHub Pages).
             </div>
         </div>
 
@@ -408,7 +395,6 @@
 
 <script>
     (function() {
-        // Éléments DOM
         const video = document.getElementById('liveVideo');
         const switchBtn = document.getElementById('switchCameraBtn');
         const likeBtn = document.getElementById('sendLikeBtn');
@@ -421,9 +407,8 @@
         const startOverlay = document.getElementById('appStartOverlay');
         const explicitStartBtn = document.getElementById('explicitStartBtn');
         
-        // Variables d'état
         let currentStream = null;
-        let currentFacing = 'user';     // 'user' = avant, 'environment' = arrière
+        let currentFacing = 'user'; 
         let cameraActive = false;
         let totalLikes = 342;
         let viewerCount = 187;
@@ -431,7 +416,6 @@
         let viewerInterval = null;
         let isSwitching = false;
         
-        // Helper : ajouter un message au chat
         function addChatMessage(username, text, isSystem = false, isOwn = false) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message-item');
@@ -446,7 +430,6 @@
             while (chatDiv.children.length > 120) chatDiv.removeChild(chatDiv.firstChild);
         }
         
-        // Cœur flottant
         function showHeart() {
             const heart = document.createElement('div');
             heart.className = 'heart-animation';
@@ -467,7 +450,6 @@
             if (animate) showHeart();
         }
         
-        // ---------- SIMULATION SPECTATEURS ----------
         function randomSpectatorLike() {
             addLikes(1, true);
             if (Math.random() < 0.35) {
@@ -481,7 +463,7 @@
         
         function randomSpectatorComment() {
             const fakeNames = ["Marie_92", "TonioLive", "PixelWarrior", "ClaraStyle", "Jules_Vibes", "LensFan", "Nina_Buzz", "Alex_Drone"];
-            const messages = ["Excellent live !", "👏👏 bravo", "Trop drôle", "Encore!!", "Super ambiance", "Vive le direct", "🎶🎶", "Tu gères!", "👍 from Paris", "🔥 ça chauffe", "Belle caméra !"];
+            const messages = ["Excellent live !", "👏👏 bravo", "Trop drôle", "Encore!!", "Super ambiance", "Vive le direct", "🎶🎶", "Tu gères!", "👍 from Paris", "🔥 ça chauffe"];
             const randomName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             addChatMessage(randomName, randomMsg, false, false);
@@ -495,9 +477,6 @@
             if (newCount > 1200) newCount = 1100;
             viewerCount = newCount;
             viewerSpan.innerText = viewerCount;
-            if (variation > 2 && Math.random() < 0.3) {
-                addChatMessage("🔔 Live", `+${variation} nouveaux spectateurs !`, true, false);
-            }
         }
         
         function startSimulation() {
@@ -525,7 +504,6 @@
         async function initCamera(facingMode) {
             if (isSwitching) return false;
             isSwitching = true;
-            
             await stopAndCleanStream();
             
             try {
@@ -537,7 +515,7 @@
                     };
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (exactError) {
-                    console.warn("Exact facingMode failed, trying generic video constraint", exactError);
+                    console.warn("Exact facingMode failed, fallback to generic camera", exactError);
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 }
                 
@@ -545,7 +523,6 @@
                     currentStream = stream;
                     video.srcObject = stream;
                     cameraActive = true;
-                    
                     const oldRetry = document.querySelector('.retry-camera');
                     if (oldRetry) oldRetry.remove();
                     isSwitching = false;
@@ -558,7 +535,7 @@
                 cameraActive = false;
                 let errorText = "Impossible d'accéder à la caméra.";
                 if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    errorText = "Permission refusée. Autorisez la caméra dans vos paramètres.";
+                    errorText = "Permission refusée. Autorisez la caméra dans les réglages.";
                 }
                 addChatMessage("📹 ERREUR", errorText, true, false);
                 
@@ -608,7 +585,6 @@
             userLikeReaction();
         });
         
-        // Initialisation déclenchée uniquement par l'action sur le bouton d'accueil (requis par Safari)
         explicitStartBtn.addEventListener('click', async () => {
             startSimulation();
             updateLikesUI();
@@ -616,17 +592,15 @@
             
             const cameraStarted = await initCamera('user');
             if (!cameraStarted) {
-                addChatMessage("📌", "Mode dégradé sans flux vidéo. Vérifiez que vous utilisez bien HTTPS.", true, false);
+                addChatMessage("📌", "Mode texte uniquement. Vérifiez les autorisations de votre navigateur.", true, false);
             } else {
-                addChatMessage("🎥", "Flux vidéo synchronisé avec succès.", true, false);
+                addChatMessage("🎥", "Flux caméra synchronisé avec succès.", true, false);
             }
             
-            // Retrait fluide de l'overlay
             startOverlay.style.opacity = '0';
             setTimeout(() => startOverlay.remove(), 400);
         });
         
-        // Événements
         switchBtn.addEventListener('click', toggleCamera);
         likeBtn.addEventListener('click', userLikeReaction);
         sendBtn.addEventListener('click', sendMessage);
