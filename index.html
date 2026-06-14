@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation Pro (Moteur V0.3.2.17 SAFE)</title>
+    <title>Live Social - Simulation Pro (Moteur V0.3.2.18 SAFE)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* --- DESIGN SYSTEM & CSS TOKENS (LiveSkin Mapping) --- */
+        /* --- DESIGN SYSTEM & CSS TOKENS --- */
         :root {
             --primary-color: #00bcd4;
             --secondary-color: #e91e63;
@@ -25,7 +25,7 @@
             user-select: none;
         }
         body {
-            background: #0a0a0a;
+            background: #000;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             color: #fff;
             height: 100vh;
@@ -33,8 +33,8 @@
             touch-action: pan-y;
         }
 
-        /* --- MODE SELECTOR SCREEN (ÉCRAN D'ACCUEIL OBLIGATOIRE) --- */
-        .mode-selector-screen {
+        /* --- ÉCRAN DOUBLE ACTION : CHOIX DE L'APPAREIL ET CONFIGURATION --- */
+        .setup-hub-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -44,115 +44,141 @@
             z-index: 99999;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            text-align: center;
+            padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)) 20px;
+            overflow-y: auto;
         }
-        .mode-selector-screen h1 {
+        .setup-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .setup-header h1 {
             font-size: 24px;
             font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
             background: linear-gradient(45deg, #00bcd4, #e91e63);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .mode-selector-screen p {
-            font-size: 14px;
+        .setup-header p {
+            font-size: 13px;
             color: #8e8e93;
-            margin-bottom: 32px;
-            max-width: 320px;
+            margin-top: 4px;
         }
-        .selector-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            width: 100%;
-            max-width: 280px;
-        }
-        .mode-btn {
+
+        .setup-section {
             background: #1c1c1e;
-            border: 2px solid #232326;
+            border: 1px solid #232326;
             border-radius: 14px;
-            padding: 18px;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.2s ease;
-            text-align: left;
+            padding: 16px;
+            margin-bottom: 16px;
         }
-        .mode-btn i {
-            font-size: 24px;
+        .setup-section h3 {
+            font-size: 13px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .setting-row {
+            margin-bottom: 14px;
+        }
+        .setting-row:last-child {
+            margin-bottom: 0;
+        }
+        .setting-row label {
+            display: block;
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .input-text, select {
+            width: 100%;
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .input-text:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Grille des appareils et skins */
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .option-card {
+            background: #2c2c2e;
+            border: 2px solid #3a3a3c;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-card i {
+            font-size: 20px;
+            margin-bottom: 6px;
+            display: block;
+            color: #8e8e93;
+        }
+        .option-card.active {
+            border-color: var(--primary-color);
+            background: rgba(0, 188, 212, 0.08);
+        }
+        .option-card.active i {
             color: var(--primary-color);
         }
-        .mode-btn div {
-            display: flex;
-            flex-direction: column;
-        }
-        .mode-btn span.title {
+        .option-title {
+            font-size: 13px;
             font-weight: 700;
-            font-size: 15px;
+            display: block;
         }
-        .mode-btn span.desc {
-            font-size: 11px;
+        .option-desc {
+            font-size: 10px;
             color: #8e8e93;
             margin-top: 2px;
-        }
-        .mode-btn:active, .mode-btn:hover {
-            border-color: var(--primary-color);
-            background: rgba(0, 188, 212, 0.05);
+            display: block;
         }
 
-        /* --- CONTENEUR PRINCIPAL DE L'APPLICATION --- */
+        /* Bouton principal de lancement */
+        .btn-launch-stream {
+            background: linear-gradient(135deg, #00bcd4, #004d40);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+        }
+
+        /* --- CONTENEUR D'EXÉCUTION DU LIVE --- */
         .live-container {
             display: flex;
-            flex-direction: column;
             height: 100vh;
             width: 100vw;
-            max-width: 100%;
-            margin: 0 auto;
-            background: #000;
             position: relative;
+            background: #000;
         }
-
-        /* --- CONFIGURATION ORDINATEUR PAR DÉFAUT --- */
-        @media (min-width: 992px) {
-            .live-container.layout-computer {
-                flex-direction: row;
-            }
-            .live-container.layout-computer .video-area {
-                flex: 1.4;
-                height: 100vh;
-            }
-            .live-container.layout-computer .control-panel {
-                flex: 1;
-                height: 100vh;
-                display: flex !important;
-                border-top: none;
-                border-left: 1px solid #232326;
-            }
-        }
-
-        /* --- MODE SMARTPHONE CIBLÉ (FORCE FULLSCREEN OVERLAY) --- */
-        .live-container.layout-smartphone .video-area {
-            width: 100vw;
-            height: 100vh;
-            flex: none;
-            min-height: 100vh;
-        }
-        .live-container.layout-smartphone .control-panel {
-            display: none !important; /* Cache complètement les menus de contrôle */
-        }
-
-        /* --- ZONE RENDU IMAGE / VIDÉO LIVE --- */
         .video-area {
             position: relative;
             background: #111;
-            flex: 2;
-            min-height: 100vh;
+            flex: 1;
+            height: 100vh;
             overflow: hidden;
         }
         .camera-preview {
@@ -160,10 +186,27 @@
             height: 100%;
             object-fit: cover;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            transform: scaleX(-1);
         }
 
-        /* --- COUCHE OVERLAY GRAPHIQUE HUD --- */
+        /* MODE COMPUTER DUAL-PANEL */
+        .live-container.layout-computer .video-area {
+            flex: 1.3;
+        }
+        .live-container.layout-computer .monitor-panel {
+            flex: 1;
+            background: #141416;
+            border-left: 1px solid #232326;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        /* S'assurer que l'écran est vide/caché sur mobile */
+        .live-container.layout-smartphone .monitor-panel {
+            display: none !important;
+        }
+
+        /* --- OVERLAY HUD --- */
         .hud-overlay {
             position: absolute;
             top: 0;
@@ -177,11 +220,8 @@
             pointer-events: none;
             padding: max(12px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)) 12px;
         }
-        .hud-overlay * {
-            pointer-events: auto;
-        }
+        .hud-overlay * { pointer-events: auto; }
 
-        /* LIVE HEADER */
         .hud-header {
             display: flex;
             align-items: center;
@@ -194,7 +234,6 @@
             background: rgba(0, 0, 0, 0.45);
             padding: 4px 10px 4px 4px;
             border-radius: 999px;
-            max-width: 60%;
             backdrop-filter: blur(4px);
         }
         .streamer-avatar {
@@ -208,56 +247,39 @@
             justify-content: center;
             color: #000;
             font-weight: bold;
-            font-size: 13px;
         }
-        .streamer-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .streamer-name {
-            font-size: 12px;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .streamer-status {
-            font-size: 10px;
-            color: rgba(255,255,255,0.75);
-        }
-        .header-badges {
+        .streamer-info { display: flex; flex-direction: column; }
+        .streamer-name { font-size: 12px; font-weight: 700; }
+        .streamer-status { font-size: 10px; color: rgba(255,255,255,0.75); }
+
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .badge-live {
             background: #ff1744;
-            color: #fff;
             font-size: 10px;
             font-weight: 800;
             padding: 5px 8px;
             border-radius: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        
-        /* VIEWER COUNTER */
-        .badge-viewers {
-            background: rgba(0, 0, 0, 0.38);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+        .btn-stop-stream {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255,255,255,0.2);
             color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 6px 10px;
-            border-radius: 999px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            font-size: 14px;
         }
 
-        /* COMMENT FEED CONTAINER (Seuil strict 9 messages) */
+        /* CHAT FEED CONTAINER */
         .hud-chat-container {
             position: absolute;
             bottom: 78px;
@@ -271,42 +293,24 @@
             overflow: hidden;
             pointer-events: none;
         }
-        
-        /* COMMENT BUBBLE Issu du switch-case Dart */
         .chat-bubble {
             background: rgba(0, 0, 0, calc(var(--panel-opacity) * 0.82));
             border-radius: var(--panel-radius);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 7px 10px;
             font-size: 13px;
-            line-height: 1.4;
             color: #fff;
-            max-width: 100%;
-            word-wrap: break-word;
             animation: slideUp 0.18s ease-out forwards;
             pointer-events: auto;
         }
-        .chat-bubble-name {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-right: 6px;
-            display: inline;
-        }
-        .chat-bubble-msg {
-            display: inline;
-            white-space: normal;
-        }
-
-        .bubble-type-question { border-color: rgba(255, 193, 7, 0.35) !important; }
-        .bubble-type-troll, .bubble-type-slang { border-color: rgba(255, 171, 64, 0.35) !important; }
-        .bubble-type-common, .bubble-type-offtopic { border-color: rgba(255, 255, 255, 0.35) !important; }
+        .chat-bubble-name { font-weight: bold; color: var(--primary-color); margin-right: 6px; display: inline; }
+        .chat-bubble-msg { display: inline; }
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ACTION BAR HUD */
         .hud-bottom-actions {
             display: flex;
             align-items: center;
@@ -337,144 +341,23 @@
             justify-content: center;
             font-size: 16px;
             cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-        .action-circle-btn:active {
-            transform: scale(0.9);
         }
 
-        /* --- ZONE PANNEAU CONTROL & MANAGEMENT (COMPUTER MODE) --- */
-        .control-panel {
-            background: #141416;
-            border-top: 1px solid #232326;
-            display: flex;
-            flex-direction: column;
-            height: 45vh;
-        }
-        .panel-tabs {
-            display: flex;
-            background: #1c1c1e;
-            border-bottom: 1px solid #232326;
-        }
-        .tab-btn {
+        /* PANNEAU MONITORING (COMPUTER ONLY) */
+        .monitor-panel h2 { font-size: 16px; margin-bottom: 12px; color: #fff; }
+        .log-box {
             flex: 1;
-            padding: 14px;
-            background: none;
-            border: none;
-            color: #8e8e93;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            background: rgba(255,255,255,0.02);
-        }
-        .panel-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
-
-        /* FORMULAIRES & CONTROLES */
-        .setting-row {
-            margin-bottom: 16px;
-        }
-        .setting-row label {
-            display: block;
-            font-size: 12px;
-            color: #8e8e93;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-        .input-text, select {
-            width: 100%;
-            background: #1c1c1e;
-            border: 1px solid #232326;
-            border-radius: 6px;
-            padding: 10px 12px;
-            color: #fff;
-            font-size: 14px;
-        }
-        .input-text:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        .skin-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .skin-card {
-            background: #1c1c1e;
-            border: 2px solid #232326;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .skin-card.active {
-            border-color: var(--primary-color);
-            background: rgba(0, 188, 212, 0.05);
-        }
-        .skin-preview-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin: 0 auto 8px auto;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .metric-box {
-            background: #1c1c1e;
-            border: 1px solid #232326;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-        .metric-val {
-            font-size: 20px;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 4px;
-        }
-        .metric-label {
-            font-size: 11px;
-            color: #8e8e93;
-        }
-
-        .backoffice-chat-log {
             background: #0b0b0c;
             border: 1px solid #232326;
             border-radius: 8px;
-            height: 140px;
-            overflow-y: auto;
-            padding: 8px;
+            padding: 10px;
             font-family: monospace;
             font-size: 12px;
-        }
-        .log-line {
-            margin-bottom: 4px;
+            overflow-y: auto;
             color: #a1a1aa;
         }
-        .log-line .tag {
-            color: var(--primary-color);
-            font-weight: bold;
-        }
+        .log-line { margin-bottom: 4px; }
+        .log-line .tag { color: var(--primary-color); font-weight: bold; }
 
         .heart-particle {
             position: absolute;
@@ -482,43 +365,78 @@
             right: 20px;
             font-size: 24px;
             pointer-events: none;
-            z-index: 100;
             animation: floatUp 0.8s ease-out forwards;
         }
         @keyframes floatUp {
             0% { transform: translateY(0) scale(0.8); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.2) rotate(15deg); opacity: 0; }
+            100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="mode-selector-screen" id="modeSelector">
-    <h1>LIVE SIMULATOR LAB</h1>
-    <p>Choisissez le mode d'affichage adapté à votre appareil actuel pour lancer la session.</p>
-    
-    <div class="selector-buttons">
-        <button class="mode-btn" onclick="selectEnvironment('smartphone')">
-            <i class="fas fa-mobile-alt"></i>
-            <div>
-                <span class="title">SMARTPHONE</span>
-                <span class="desc">Plein écran immersif, menus masqués.</span>
-            </div>
-        </button>
-        
-        <button class="mode-btn" onclick="selectEnvironment('computer')">
-            <i class="fas fa-desktop"></i>
-            <div>
-                <span class="title">COMPUTER</span>
-                <span class="desc">Interface complète avec panneau latéral.</span>
-            </div>
-        </button>
+<div class="setup-hub-screen" id="setupHub">
+    <div class="setup-header">
+        <h1>LIVE SIMULATOR LAB</h1>
+        <p>Phase de paramétrage de la session de simulation</p>
     </div>
+
+    <div class="setup-section">
+        <h3>1. Environnement d'affichage</h3>
+        <div class="option-grid">
+            <div class="option-card active" id="targetSmartphone" onclick="setTargetDevice('smartphone')">
+                <i class="fas fa-mobile-alt"></i>
+                <span class="option-title">SMARTPHONE</span>
+                <span class="option-desc">Plein écran, backoffice masqué</span>
+            </div>
+            <div class="option-card" id="targetComputer" onclick="setTargetDevice('computer')">
+                <i class="fas fa-desktop"></i>
+                <span class="option-title">COMPUTER</span>
+                <span class="option-desc">Affichage scindé avec console</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="setup-section">
+        <h3>2. Profil du diffuseur</h3>
+        <div class="setting-row">
+            <label>Nom d'utilisateur</label>
+            <input type="text" class="input-text" id="cfgUsername" value="creator_lab">
+        </div>
+        <div class="setting-row">
+            <label>Statut / Localisation</label>
+            <input type="text" class="input-text" id="cfgLocation" value="En direct">
+        </div>
+        <div class="setting-row">
+            <label>Capteur Caméra</label>
+            <select id="cfgCamera">
+                <option value="user">Caméra Avant (Miroir)</option>
+                <option value="environment">Caméra Arrière</option>
+                <option value="none">Aucune (Arrière-plan dégradé)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="setup-section">
+        <h3>3. Skin & Filtre de Chat</h3>
+        <div class="setting-row">
+            <label>Sélection de l'interface</label>
+            <select id="cfgSkin" onchange="previewSkinChange(this.value)">
+                <option value="blueSocial">BlueSocial (Cyan / Cyber)</option>
+                <option value="redVideo">RedVideo (Rouge / Média)</option>
+                <option value="debug">Debug Mode (Vert / Matrice)</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-launch-stream" onclick="launchSimulationSession()">
+        <i class="fas fa-play"></i> Lancer le Stream
+    </button>
 </div>
 
 <div class="live-container layout-computer" id="mainContainer">
     
-    <div class="video-area" id="videoArea">
+    <div class="video-area">
         <video class="camera-preview" id="webcamSrc" autoplay playsinline muted></video>
         <div id="particleSpace"></div>
 
@@ -532,11 +450,11 @@
                     </div>
                 </div>
                 
-                <div class="header-badges">
+                <div class="header-actions">
                     <span class="badge-live">Direct</span>
-                    <div class="badge-viewers" id="hudViewerBadge">
-                        <i class="fas fa-eye"></i> <span id="viewerCount">0</span>
-                    </div>
+                    <button class="btn-stop-stream" onclick="stopSimulationSession()" title="Arrêter le stream">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
 
@@ -545,346 +463,186 @@
             <div class="hud-bottom-actions">
                 <div class="hud-input-fake">Écrire un commentaire...</div>
                 <button class="action-circle-btn" id="sendLikeBtn"><i class="fas fa-heart"></i></button>
-                <button class="action-circle-btn" id="sendGiftBtn" style="color: var(--secondary-color);"><i class="fas fa-gift"></i></button>
             </div>
         </div>
     </div>
 
-    <div class="control-panel" id="controlPanel">
-        <nav class="panel-tabs">
-            <button class="tab-btn active" data-target="tabConfig">Configuration</button>
-            <button class="tab-btn" data-target="tabEngine">Moteur de flux</button>
-        </nav>
-
-        <div class="panel-content">
-            <div class="tab-pane active" id="tabConfig">
-                <div class="setting-row">
-                    <label>Nom d'utilisateur (Simulé)</label>
-                    <input type="text" class="input-text" id="cfgUsername" value="creator_lab">
-                </div>
-                <div class="setting-row">
-                    <label>Label Localisation / Statut</label>
-                    <input type="text" class="input-text" id="cfgLocation" value="Studio de test">
-                </div>
-                <div class="setting-row">
-                    <label>Caméra Matérielle</label>
-                    <select id="cfgCamera">
-                        <option value="user">Caméra Avant (Miroir)</option>
-                        <option value="environment">Caméra Arrière</option>
-                        <option value="none">Aucune (Dégradé de Fond)</option>
-                    </select>
-                </div>
-                <div class="setting-row">
-                    <label>Sélection du Skin (Thématisation)</label>
-                    <div class="skin-grid">
-                        <div class="skin-card active" data-skin="blueSocial">
-                            <div class="skin-preview-dot" style="background: #00bcd4;"></div>
-                            <span style="font-size: 11px;">BlueSocial</span>
-                        </div>
-                        <div class="skin-card" data-skin="redVideo">
-                            <div class="skin-preview-dot" style="background: #ff1744;"></div>
-                            <span style="font-size: 11px;">RedVideo</span>
-                        </div>
-                        <div class="skin-card" data-skin="debug">
-                            <div class="skin-preview-dot" style="background: #00ff00;"></div>
-                            <span style="font-size: 11px;">Debug</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane" id="tabEngine">
-                <div class="metrics-grid">
-                    <div class="metric-box">
-                        <div class="metric-label">Spectateurs</div>
-                        <div class="metric-val" id="totalViewersRealtime">0</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-label">Mentions J'aime</div>
-                        <div class="metric-val" id="totalLikesRealtime">0</div>
-                    </div>
-                </div>
-                <div class="setting-row">
-                    <label>Injection Manuelle de Message (Test)</label>
-                    <div style="display: flex; gap: 6px;">
-                        <input type="text" class="input-text" id="chatInput" placeholder="Tapez un message simulé...">
-                        <button id="sendMsgBtn" style="padding: 0 14px; background: var(--primary-color); border: none; border-radius: 6px; color:#000; font-weight: bold; cursor:pointer;">Injecter</button>
-                    </div>
-                </div>
-                <div class="setting-row">
-                    <label>Journal d'activité Console Backoffice</label>
-                    <div class="backoffice-chat-log" id="backofficeLog"></div>
-                </div>
-            </div>
-        </div>
+    <div class="monitor-panel">
+        <h2>Console de Supervision</h2>
+        <div class="log-box" id="backofficeLog"></div>
     </div>
 
 </div>
 
 <script>
-    /* --- FONCTION DE SÉLECTION D'ENVIRONNEMENT & PLEIN ÉCRAN FORCÉ --- */
-    function selectEnvironment(mode) {
-        const container = document.getElementById('mainContainer');
-        const selector = document.getElementById('modeSelector');
+    const SKIN_REPOSITORY = {
+        'blueSocial': { primary: '#00bcd4', secondary: '#e91e63', bgStart: '#0a192f', bgEnd: '#020c1b', opacity: 0.42, panelRadius: '12px', buttonRadius: '999px' },
+        'redVideo': { primary: '#ff1744', secondary: '#ffffff', bgStart: '#1a0508', bgEnd: '#050001', opacity: 0.60, panelRadius: '8px', buttonRadius: '8px' },
+        'debug': { primary: '#00ff00', secondary: '#ff00ff', bgStart: '#000000', bgEnd: '#111111', opacity: 0.75, panelRadius: '0px', buttonRadius: '0px' }
+    };
+
+    const MOCK_USERNAMES = ['Alex_92', 'Lara_Croft', 'Dorian_G', 'Sophie.Tech', 'AlphaRoméo', 'User9482', 'GamerPro', 'Chloee_Star'];
+    const MOCK_PHRASES = [
+        "Le live est vraiment super sympa ce soir !",
+        "Tu utilises quel type de caméra pour ce rendu ?",
+        "Incroyable cette démo ! Let's go !! 🔥",
+        "Est-ce que le projet est open-source ?",
+        "C'est propre, rien à redire sur le cadrage.",
+        "Grosse ambiance ici !"
+    ];
+
+    let targetDevice = 'smartphone';
+    let localStream = null;
+    let commentInterval = null;
+    let activeBubblesCount = 0;
+    let totalLikes = 0;
+
+    function setTargetDevice(device) {
+        targetDevice = device;
+        document.getElementById('targetSmartphone').classList.toggle('active', device === 'smartphone');
+        document.getElementById('targetComputer').classList.toggle('active', device === 'computer');
+    }
+
+    function previewSkinChange(skinId) {
+        const skin = SKIN_REPOSITORY[skinId];
+        if (skin) {
+            document.documentElement.style.setProperty('--primary-color', skin.primary);
+        }
+    }
+
+    // PHASE 1 -> PHASE 2 : LANCEMENT ET ORCHESTRATION DU MOTEUR
+    async function launchSimulationSession() {
+        const username = document.getElementById('cfgUsername').value.trim() || 'creator_lab';
+        const location = document.getElementById('cfgLocation').value.trim() || 'En direct';
+        const cameraFacing = document.getElementById('cfgCamera').value;
+        const skinId = document.getElementById('cfgSkin').value;
+
+        // Configuration de l'UI du Live
+        document.getElementById('hudUsername').innerText = username;
+        document.getElementById('hudLocation').innerText = location;
+        document.getElementById('hudAvatar').innerText = username.charAt(0).toUpperCase();
         
-        if (mode === 'smartphone') {
+        applySkin(skinId);
+
+        // Gestion de la disposition d'écran
+        const container = document.getElementById('mainContainer');
+        if (targetDevice === 'smartphone') {
             container.className = "live-container layout-smartphone";
-            
-            // Essayer d'activer le plein écran natif de l'appareil (nécessite un clic utilisateur)
             const docEl = document.documentElement;
             if (docEl.requestFullscreen) docEl.requestFullscreen();
             else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-            else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
         } else {
             container.className = "live-container layout-computer";
         }
-        
-        // Retirer l'écran de sélection
-        selector.style.display = 'none';
+
+        // Init Hardware Caméra
+        await initCamera(cameraFacing);
+
+        // Masquer le Hub et lancer les générateurs
+        document.getElementById('setupHub').style.display = 'none';
+        startEngineLoops();
+        appendLog(`Session de simulation lancée avec succès (${targetDevice}).`);
     }
 
-    (function() {
-        const SKIN_REPOSITORY = {
-            'blueSocial': {
-                primary: '#00bcd4', secondary: '#e91e63',
-                bgStart: '#0a192f', bgEnd: '#020c1b',
-                opacity: 0.42, panelRadius: '12px', buttonRadius: '999px'
-            },
-            'redVideo': {
-                primary: '#ff1744', secondary: '#ffffff',
-                bgStart: '#1a0508', bgEnd: '#050001',
-                opacity: 0.60, panelRadius: '8px', buttonRadius: '8px'
-            },
-            'debug': {
-                primary: '#00ff00', secondary: '#ff00ff',
-                bgStart: '#000000', bgEnd: '#111111',
-                opacity: 0.75, panelRadius: '0px', buttonRadius: '0px'
-            }
-        };
+    // PHASE 2 -> PHASE 1 : RETOUR SÉCURISÉ ET EXTINCTION DES BOUCLES
+    function stopSimulationSession() {
+        // Arrêt des boucles asynchrones
+        clearInterval(commentInterval);
+        commentInterval = null;
 
-        let currentSkinId = 'blueSocial';
-        let viewerCount = 485;
-        let totalLikes = 0;
-        let currentFacing = 'user';
-        let localStream = null;
-        let activeBubblesCount = 0;
+        // Extinction caméra matérielle
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+        document.getElementById('webcamSrc').srcObject = null;
 
-        const COMMENT_TYPES = ['common', 'question', 'hype', 'reaction', 'giftReaction', 'lightTroll', 'offtopicLife', 'slang'];
-        const MOCK_USERNAMES = ['Alex_92', 'Lara_Croft', 'Dorian_G', 'Kev_Web', 'Sophie.Tech', 'AlphaRoméo', 'User9482', 'GamerPro', 'Chloee_Star', 'Max_Power'];
-        const MOCK_PHRASES = [
-            "Le live est vraiment super sympa ce soir !",
-            "Tu utilises quel type de caméra pour ce rendu ?",
-            "Incroyable cette démo ! Let's go !! 🔥",
-            "Est-ce que le projet est open-source ?",
-            "Wesh ça va ou quoi l'équipe ?",
-            "Je viens de débarquer, ça parle de quoi ?",
-            "Mon chat vient de renverser mon café à l'instant... 😹",
-            "C'est propre, rien à redire sur le cadrage.",
-            "Grosse ambiance ici !"
-        ];
+        // Nettoyage de la mémoire graphique (Éviter toute fuite de DOM)
+        const feedContainer = document.getElementById('hudChatFeed');
+        feedContainer.innerHTML = '';
+        activeBubblesCount = 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setupTabs();
-            setupConfigListeners();
-            applySkin(currentSkinId);
-            syncProfileHUD();
-            initCamera(currentFacing);
-            startSimulationEngine();
-        });
-
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById(tab.dataset.target).classList.add('active');
-                });
-            });
+        // Sortie du plein écran si activé
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
         }
 
-        function setupConfigListeners() {
-            document.getElementById('cfgUsername').addEventListener('input', syncProfileHUD);
-            document.getElementById('cfgLocation').addEventListener('input', syncProfileHUD);
+        // Restitution du Hub de Configuration
+        document.getElementById('setupHub').style.display = 'flex';
+        appendLog("Session arrêtée. Retour au hub de configuration.");
+    }
+
+    function applySkin(skinId) {
+        const skin = SKIN_REPOSITORY[skinId];
+        const root = document.documentElement;
+        root.style.setProperty('--primary-color', skin.primary);
+        root.style.setProperty('--secondary-color', skin.secondary);
+        root.style.setProperty('--gradient-start', skin.bgStart);
+        root.style.setProperty('--gradient-end', skin.bgEnd);
+        root.style.setProperty('--panel-opacity', skin.opacity);
+        root.style.setProperty('--panel-radius', skin.panelRadius);
+        root.style.setProperty('--button-radius', skin.buttonRadius);
+    }
+
+    async function initCamera(facing) {
+        const videoElement = document.getElementById('webcamSrc');
+        if (facing === 'none') {
+            videoElement.style.display = 'none';
+            return;
+        }
+        videoElement.style.display = 'block';
+        videoElement.style.transform = facing === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
+            videoElement.srcObject = localStream;
+        } catch (err) {
+            console.warn("Caméra inaccessible", err);
+            videoElement.style.display = 'none';
+        }
+    }
+
+    function startEngineLoops() {
+        commentInterval = setInterval(() => {
+            const user = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)];
+            const msg = MOCK_PHRASES[Math.floor(Math.random() * MOCK_PHRASES.length)];
             
-            document.getElementById('cfgCamera').addEventListener('change', (e) => {
-                currentFacing = e.target.value;
-                initCamera(currentFacing);
-            });
-
-            const cards = document.querySelectorAll('.skin-card');
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    cards.forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    currentSkinId = card.dataset.skin;
-                    applySkin(currentSkinId);
-                });
-            });
-        }
-
-        function syncProfileHUD() {
-            const username = document.getElementById('cfgUsername').value.trim() || 'user_lab';
-            const location = document.getElementById('cfgLocation').value.trim() || 'En direct';
-            
-            document.getElementById('hudUsername').innerText = username;
-            document.getElementById('hudLocation').innerText = location;
-            document.getElementById('hudAvatar').innerText = username.charAt(0).toUpperCase();
-        }
-
-        function applySkin(skinId) {
-            const skin = SKIN_REPOSITORY[skinId] || SKIN_REPOSITORY['blueSocial'];
-            const root = document.documentElement;
-
-            root.style.setProperty('--primary-color', skin.primary);
-            root.style.setProperty('--secondary-color', skin.secondary);
-            root.style.setProperty('--gradient-start', skin.bgStart);
-            root.style.setProperty('--gradient-end', skin.bgEnd);
-            root.style.setProperty('--panel-opacity', skin.opacity);
-            root.style.setProperty('--panel-radius', skin.panelRadius);
-            root.style.setProperty('--button-radius', skin.buttonRadius);
-
-            document.getElementById('hudViewerBadge').style.borderColor = `${skin.primary}8C`;
-            appendLogSystem(`Skin permuté avec succès : [${skinId}]`);
-        }
-
-        async function initCamera(facing) {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-
-            const videoElement = document.getElementById('webcamSrc');
-            if (facing === 'none') {
-                videoElement.style.display = 'none';
-                videoElement.srcObject = null;
-                return;
-            }
-
-            videoElement.style.display = 'block';
-            videoElement.style.transform = facing === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
-
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facing },
-                    audio: false
-                });
-                videoElement.srcObject = localStream;
-            } catch (err) {
-                console.warn("Accès caméra refusé ou indisponible : ", err);
-                videoElement.style.display = 'none';
-            }
-        }
-
-        function appendMessage(username, message, type = 'common') {
             const feedContainer = document.getElementById('hudChatFeed');
             const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.innerHTML = `<div class="chat-bubble-name">${user}</div><div class="chat-bubble-msg">${msg}</div>`;
             
-            let dartTypeClass = 'bubble-type-common';
-            if (type === 'question') dartTypeClass = 'bubble-type-question';
-            else if (type === 'lightTroll') dartTypeClass = 'bubble-type-troll';
-            else if (type === 'slang') dartTypeClass = 'bubble-type-slang';
-            else if (type === 'offtopicLife') dartTypeClass = 'bubble-type-offtopic';
-            
-            bubble.className = `chat-bubble ${dartTypeClass}`;
-
-            if (['hype', 'reaction', 'giftReaction'].includes(type)) {
-                bubble.style.borderColor = `var(--primary-color)`;
-            }
-
-            bubble.innerHTML = `
-                <div class="chat-bubble-name">${username}</div>
-                <div class="chat-bubble-msg">${message}</div>
-            `;
-
             feedContainer.appendChild(bubble);
             activeBubblesCount++;
 
-            /* RÈGLE STRICT DART : TRONQUER À 9 BULLES MAX */
             while (activeBubblesCount > 9) {
-                const oldestBubble = feedContainer.firstElementChild;
-                if (oldestBubble) {
-                    feedContainer.removeChild(oldestBubble);
-                    activeBubblesCount--;
-                }
+                feedContainer.removeChild(feedContainer.firstElementChild);
+                activeBubblesCount--;
             }
 
-            appendLogBackoffice(username, message, type);
-        }
+            appendLog(`[CHAT] ${user}: ${msg}`);
+        }, 3200);
+    }
 
-        function startSimulationEngine() {
-            document.getElementById('viewerCount').innerText = viewerCount;
-            document.getElementById('totalViewersRealtime').innerText = viewerCount;
+    function appendLog(text) {
+        const logBox = document.getElementById('backofficeLog');
+        const entry = document.createElement('div');
+        entry.className = 'log-line';
+        entry.innerHTML = `<span class="tag">[SYS]</span> ${text}`;
+        logBox.appendChild(entry);
+        logBox.scrollTop = logBox.scrollHeight;
+    }
 
-            setInterval(() => {
-                const diff = Math.floor(Math.random() * 5) - 2;
-                viewerCount = Math.max(12, viewerCount + diff);
-                document.getElementById('viewerCount').innerText = viewerCount;
-                document.getElementById('totalViewersRealtime').innerText = viewerCount;
-            }, 5000);
-
-            setInterval(() => {
-                const randomUser = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)];
-                const randomMsg = MOCK_PHRASES[Math.floor(Math.random() * MOCK_PHRASES.length)];
-                const randomType = COMMENT_TYPES[Math.floor(Math.random() * COMMENT_TYPES.length)];
-                
-                appendMessage(randomUser, randomMsg, randomType);
-            }, 3800);
-        }
-
-        function appendLogBackoffice(user, msg, type) {
-            const logBox = document.getElementById('backofficeLog');
-            if (!logBox) return;
-            const entry = document.createElement('div');
-            entry.className = 'log-line';
-            entry.innerHTML = `[${type.toUpperCase()}] <span class="tag">${user}:</span> ${msg}`;
-            logBox.appendChild(entry);
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        function appendLogSystem(text) {
-            const logBox = document.getElementById('backofficeLog');
-            if (!logBox) return;
-            const entry = document.createElement('div');
-            entry.className = 'log-line';
-            entry.style.color = '#5cb85c';
-            entry.innerHTML = `[SYS] <span>${text}</span>`;
-            logBox.appendChild(entry);
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        document.getElementById('sendLikeBtn').addEventListener('click', () => {
-            totalLikes++;
-            document.getElementById('totalLikesRealtime').innerText = totalLikes;
-            
-            const particleSpace = document.getElementById('particleSpace');
-            const heart = document.createElement('div');
-            heart.className = 'heart-particle';
-            heart.innerHTML = '❤️';
-            heart.style.left = `${Math.floor(Math.random() * 60) + 200}px`;
-            particleSpace.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 800);
-            appendMessage("Moi", "a aimé le live ! 💖", "hype");
-        });
-
-        document.getElementById('sendGiftBtn').addEventListener('click', () => {
-            appendMessage("Moi", "a envoyé un cadeau ! 🎁", "giftReaction");
-        });
-
-        document.getElementById('sendMsgBtn').addEventListener('click', () => {
-            const input = document.getElementById('chatInput');
-            const val = input.value.trim();
-            if (!val) return;
-            appendMessage("Moi", val, "common");
-            input.value = '';
-        });
-
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('sendMsgBtn').click();
-        });
-    })();
+    document.getElementById('sendLikeBtn').addEventListener('click', () => {
+        const space = document.getElementById('particleSpace');
+        const heart = document.createElement('div');
+        heart.className = 'heart-particle';
+        heart.innerHTML = '❤️';
+        heart.style.left = `${Math.floor(Math.random() * 60) + 200}px`;
+        space.appendChild(heart);
+        setTimeout(() => heart.remove(), 800);
+        appendLog("[ACTION] Mention J'aime envoyée");
+    });
 </script>
-
 </body>
 </html>
