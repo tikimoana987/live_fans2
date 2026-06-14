@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#05070f">
-  <title>Live Simulator Lab — V0.3.2.21 SAFE</title>
+  <title>Live Simulator Lab — V0.3.2.22 SAFE</title>
   <style>
     :root {
       --primary-color: #00bcd4;
@@ -410,40 +410,43 @@
       font-size: 13px;
     }
 
+    /* V0.3.2.22 SAFE — positionnement canonique inspiré du rendu mobile validé
+       Objectif : rail d’actions dans le tiers inférieur droit, interactions dockées au-dessus de la saisie. */
     .right-action-rail,
     .right-bottom-rail {
       position: absolute;
-      right: max(16px, env(safe-area-inset-right));
+      right: max(24px, env(safe-area-inset-right));
       z-index: 30;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 14px;
       pointer-events: auto;
     }
 
     .right-action-rail {
-      top: 56%;
+      top: 72%;
       transform: translateY(-50%);
+      flex-direction: column;
+      gap: 18px;
     }
 
     .right-bottom-rail {
-      bottom: calc(var(--safe-bottom) + 36px);
+      right: max(26px, env(safe-area-inset-right));
+      bottom: calc(var(--safe-bottom) + 52px);
       flex-direction: row;
-      gap: 12px;
+      gap: 14px;
     }
 
     .rail-btn {
-      width: 58px;
-      height: 58px;
-      font-size: 24px;
-      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+      width: 60px;
+      height: 60px;
+      font-size: 25px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.34);
     }
 
     .rail-btn.secondary-action {
-      width: 54px;
-      height: 54px;
-      font-size: 23px;
+      width: 58px;
+      height: 58px;
+      font-size: 24px;
     }
 
     .hud-system-btn,
@@ -481,23 +484,36 @@
       background: #ff1744 !important;
     }
 
+    .close-stream-btn {
+      width: 58px;
+      height: 58px;
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(70, 76, 92, 0.78);
+      color: #fff;
+      font-size: 32px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
     .hud-chat-container {
       position: absolute;
-      left: 12px;
-      bottom: 78px;
+      left: max(24px, env(safe-area-inset-left));
+      bottom: calc(var(--safe-bottom) + 92px);
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
       justify-content: flex-end;
-      gap: 6px;
-      width: min(320px, calc(100vw - 24px));
-      max-height: min(340px, 45vh);
+      gap: 8px;
+      width: min(620px, calc(100vw - 230px));
+      max-height: min(680px, 48vh);
       overflow: hidden;
       pointer-events: none;
     }
 
     .comment-bubble {
+      width: fit-content;
       max-width: 100%;
-      padding: 8px 12px;
+      padding: 9px 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.12);
       border-right: 1px solid rgba(255, 255, 255, 0.12);
       border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -560,7 +576,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 100%;
+      width: min(620px, calc(100vw - 230px));
+      max-width: 620px;
     }
 
     .chat-input-wrapper {
@@ -705,25 +722,13 @@
     }
 
     .live-container.layout-smartphone .hud-chat-container {
-      width: min(470px, calc(100vw - 115px));
-      max-height: 48vh;
+      width: min(620px, calc(100vw - 230px));
+      max-height: 50vh;
     }
 
     .live-container.layout-smartphone .hud-bottom-actions {
-      width: calc(100vw - 112px);
+      width: min(620px, calc(100vw - 230px));
       max-width: 620px;
-    }
-
-    .live-container.layout-smartphone .rail-btn {
-      width: 56px;
-      height: 56px;
-      font-size: 23px;
-    }
-
-    .live-container.layout-smartphone .right-bottom-rail .rail-btn {
-      width: 52px;
-      height: 52px;
-      font-size: 22px;
     }
 
     .live-container.layout-smartphone .hud-system-btn {
@@ -789,8 +794,24 @@
       }
 
       .right-action-rail {
-        right: max(18px, env(safe-area-inset-right));
-        gap: 16px;
+        top: 72%;
+        right: max(22px, env(safe-area-inset-right));
+        gap: 18px;
+      }
+
+      .right-bottom-rail {
+        right: max(24px, env(safe-area-inset-right));
+        bottom: calc(var(--safe-bottom) + 54px);
+      }
+
+      .hud-chat-container {
+        left: max(24px, env(safe-area-inset-left));
+        bottom: calc(var(--safe-bottom) + 96px);
+        width: min(620px, calc(100vw - 230px));
+      }
+
+      .hud-bottom-actions {
+        width: min(620px, calc(100vw - 230px));
       }
     }
 
@@ -810,7 +831,7 @@
   <main class="setup-hub-screen" id="setupHub" aria-label="Configuration de la session">
     <header class="setup-header">
       <h1>LIVE SIMULATOR LAB</h1>
-      <p>V0.3.2.21 SAFE — console uniquement en DEBUG + contrôles latéraux</p>
+      <p>V0.3.2.22 SAFE — positionnement HUD canonique</p>
     </header>
 
     <section class="setup-layout">
@@ -916,7 +937,7 @@
           <div class="live-status-cluster" aria-label="Statut live">
             <span class="badge-live" id="liveBadge">DIRECT</span>
             <div class="viewer-pill"><span class="stat-eye">◉</span><span id="viewerCountDisplay">0</span></div>
-            <button class="hud-system-btn btn-active-red" type="button" onclick="stopSimulationSession()" title="Quitter">×</button>
+            <button class="hud-system-btn close-stream-btn" type="button" onclick="stopSimulationSession()" title="Quitter">×</button>
           </div>
         </div>
 
@@ -957,7 +978,7 @@
   <script>
     "use strict";
 
-    const APP_VERSION = "V0.3.2.21-SAFE-DEBUG-RAIL";
+    const APP_VERSION = "V0.3.2.22-SAFE-CANONICAL-HUD-POSITIONING";
 
     const SKIN_REPOSITORY = {
       blueSocial: { primary: "#00bcd4", secondary: "#e91e63", bgStart: "#0a192f", bgEnd: "#020c1b", opacity: 0.48, panelRadius: "12px", buttonRadius: "999px" },
@@ -1363,7 +1384,6 @@
 
     function updateStatsDisplay() {
       setText("viewerCountDisplay", state.viewerCount);
-      setText("likeCountDisplay", state.totalLikes);
       setText("metricViewers", state.viewerCount);
       setText("metricLikes", state.totalLikes);
       setText("metricMode", state.sessionStarted ? state.activityMode.toUpperCase() : "IDLE");
