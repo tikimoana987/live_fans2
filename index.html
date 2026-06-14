@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Live Social - Simulation Pro (mobile & desktop)</title>
+    <title>Live Social - Simulation Pro (Moteur Français Complet)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -13,7 +13,7 @@
         }
         body {
             background: #0a0a0a;
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
             color: #fff;
             height: 100vh;
             overflow: hidden;
@@ -66,7 +66,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            backdrop-filter: blur(4px);
             pointer-events: auto;
         }
         .live-badge i {
@@ -111,11 +110,9 @@
             justify-content: center;
             cursor: pointer;
             z-index: 10;
-            transition: 0.2s;
             pointer-events: auto;
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
-        .camera-switch-btn:active { transform: scale(0.94); }
         
         .interaction-area {
             background: #0f0f0f;
@@ -123,7 +120,6 @@
             display: flex;
             flex-direction: column;
             border-top: 1px solid #2a2a2a;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.4);
             position: relative;
         }
         .reaction-toolbar {
@@ -157,14 +153,8 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            font-size: 0.95rem;
-            transition: 0.2s;
-            box-shadow: 0 2px 8px rgba(255,45,85,0.3);
-            position: relative;
         }
-        .btn-like:active { transform: scale(0.96); }
         
-        /* Fenêtre de tchat */
         .chat-window {
             flex: 1;
             overflow-y: auto;
@@ -181,7 +171,7 @@
             gap: 10px;
             background: rgba(26, 26, 36, 0.5);
             backdrop-filter: blur(4px);
-            border-radius: 18px;
+            border-radius: 14px;
             padding: 8px 12px;
             max-width: 95%;
             font-size: 0.85rem;
@@ -212,7 +202,6 @@
             align-items: center;
             gap: 4px;
             font-weight: bold;
-            color: #ff9f4a;
         }
         .badge-verified {
             color: #3897f0;
@@ -222,13 +211,6 @@
             color: #efefef;
             line-height: 1.3;
         }
-        
-        /* Messages système & d'arrivées */
-        .system-message {
-            background: rgba(255, 75, 45, 0.1);
-            border-left-color: #ff453a;
-        }
-        .system-message .username-wrapper { color: #ff453a; }
         
         .join-message {
             background: transparent;
@@ -248,7 +230,6 @@
             align-self: flex-end;
             border-left-color: #2a9d8f;
         }
-        .my-message .username-wrapper { color: #2a9d8f; }
         
         .chat-input-area {
             display: flex;
@@ -276,13 +257,11 @@
             border-radius: 50%;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
-        /* Conteneur des cœurs flottants à la TikTok */
         .heart-stream-container {
             position: absolute;
             right: 20px;
@@ -303,45 +282,14 @@
             animation: floatUpStream 2.2s cubic-bezier(0.08, 0.74, 0.31, 1) forwards;
         }
         @keyframes floatUpStream {
-            0% {
-                opacity: 0;
-                transform: bottom 0px scale(0.5) translateX(0);
-            }
-            12% {
-                opacity: 0.95;
-                transform: scale(1.1);
-            }
-            85% {
-                opacity: 0.8;
-            }
-            100% {
-                opacity: 0;
-                bottom: 280px;
-                transform: scale(1.4) translateX(var(--x-end));
-            }
+            0% { opacity: 0; transform: bottom 0px scale(0.5) translateX(0); }
+            12% { opacity: 0.95; transform: scale(1.1); }
+            85% { opacity: 0.8; }
+            100% { opacity: 0; bottom: 280px; transform: scale(1.4) translateX(var(--x-end)); }
         }
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .chat-window::-webkit-scrollbar { width: 4px; }
-        .chat-window::-webkit-scrollbar-thumb { background: #ff3b30; border-radius: 10px; }
-
-        .retry-camera {
-            position: absolute;
-            bottom: 80px;
-            left: 20px;
-            background: #ff3b30;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 15;
-            box-shadow: 0 2px 10px black;
         }
         
         .start-overlay {
@@ -357,8 +305,6 @@
             padding: 20px;
             transition: opacity 0.4s ease;
         }
-        .start-overlay h2 { font-size: 1.5rem; font-weight: 700; text-align: center; }
-        .start-overlay p { font-size: 0.85rem; color: #aaa; text-align: center; max-width: 290px; line-height: 1.4; }
         .start-btn {
             background: linear-gradient(135deg, #ff3b30, #ff453a);
             color: white;
@@ -369,24 +315,14 @@
             font-size: 1.05rem;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        @media (max-width: 700px) {
-            .video-area { min-height: 42vh; }
-            .camera-switch-btn { width: 44px; height: 44px; bottom: 12px; right: 12px; font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="start-overlay" id="appStartOverlay">
-    <h2>Simulation Intelligente Live</h2>
-    <p>Accédez à l'expérience plein écran ultra-réaliste avec interactions de foule synchronisées et gestion vidéo avancée.</p>
-    <button class="start-btn" id="explicitStartBtn">
-        <i class="fas fa-expand"></i> Démarrer la Simulation
-    </button>
+    <h2>Simulation Live Intégrale (FR)</h2>
+    <button class="start-btn" id="explicitStartBtn">Lancer le direct</button>
 </div>
 
 <div class="live-container">
@@ -395,11 +331,11 @@
         <div class="video-overlay">
             <div class="live-badge"><i class="fas fa-circle"></i> EN DIRECT</div>
             <div class="stats-header">
-                <span><i class="fas fa-eye"></i> <span id="viewerCount">187</span></span>
-                <span><i class="fas fa-heart"></i> <span id="likeCountDisplay">342</span></span>
+                <span><i class="fas fa-eye"></i> <span id="viewerCount">142</span></span>
+                <span><i class="fas fa-heart"></i> <span id="likeCountDisplay">254</span></span>
             </div>
         </div>
-        <button id="switchCameraBtn" class="camera-switch-btn"><i class="fas fa-camera-retro"></i></button>
+        <button id="switchCameraBtn" class="camera-switch-btn"><i class="fas fa-camera"></i></button>
     </div>
 
     <div class="interaction-area">
@@ -407,20 +343,12 @@
 
         <div class="reaction-toolbar">
             <div class="like-count">
-                <i class="fas fa-heart"></i> <span id="totalLikesRealtime">342</span> likes
+                <i class="fas fa-heart"></i> <span id="totalLikesRealtime">254</span>
             </div>
-            <button id="sendLikeBtn" class="btn-like"><i class="fas fa-heart"></i> J'aime</button>
+            <button id="sendLikeBtn" class="btn-like"><i class="fas fa-heart"></i></button>
         </div>
 
-        <div class="chat-window" id="chatMessages">
-            <div class="message-item system-message">
-                <div class="avatar" style="background:#ff3b30">⚙️</div>
-                <div class="msg-content">
-                    <span class="username-wrapper">Système</span>
-                    <span class="msg-text">Mode Plein Écran & Moteur d'audience actif. Double-cliquez sur l'écran pour liker.</span>
-                </div>
-            </div>
-        </div>
+        <div class="chat-window" id="chatMessages"></div>
 
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ajouter un commentaire..." autocomplete="off">
@@ -431,236 +359,155 @@
 
 <script>
     (function() {
+        // Injection complète et rigoureuse de vos catalogues de contenu FR
+        const commentsDb = {
+            common: ["Salut le live","Ça rend bien","On est là","Bonne énergie","La qualité est propre","Continue comme ça","Très naturel","Je reste regarder","Ça commence bien","Premier live que je vois de toi","Je viens d'arriver, je rattrape","Bonne ambiance ce soir","Ça donne envie de rester","Belle énergie aujourd'hui","Tu gères bien","Le son est clair","On capte bien tout","Bonne soirée à toi","Je suis fan de ce format","C'est cool de te voir live","Tranquille ce live","Petit coucou en passant","Je découvre, je reste un peu","C'est apaisant à regarder","Ravi de tomber sur ce live","Toujours sympa de passer ici"],
+            hype: ["Incroyable","Trop fort","Let's go","Le live est propre","Grosse ambiance","Ça monte fort","On défonce tout ce soir","Ça part fort","Énorme","C'est de la balle","Ambiance de feu","Ça chauffe","Vous gérez tous","Le pic est énorme","C'est parti","On y croit à fond","Belle montée","Ça envoie","Niveau maximum","C'est le feu","C'est dingue cette ambiance"],
+            offtopic_life: ["Vive le PSG","Quelqu'un a vu le nouveau Pokémon ?","J'adore les pâtes carbonara","Mon chat vient de renverser mon café","Il pleut chez moi","Je mange une pizza en regardant","Allez l'OM","J'ai trop la dalle là","Mon voisin fait encore du bruit","Le café est meilleur que le thé","Je révise pendant que je regarde","Vivement le week-end","Mon téléphone est à 1% là","Je suis sous ma couette, trop bien","Mon Wifi rame un peu"],
+            questions: ["Tu fais ça depuis combien de temps ?","Tu peux montrer la config ?","C'est quoi ton setup ?","Tu réponds aux questions ?","Tu vas live combien de temps ?","Tu fais ça tous les jours ?","C'est quoi le programme aujourd'hui ?","Tu es où exactement ?","Tu utilises quel logiciel ?","Tu lis tous les messages ?","Tu utilises quel micro ?","Tu as un planning de lives ?"],
+            slang: ["Wesh ça va ou quoi","C'est clean frérot","J'suis mort de rire","Askip c'est la hype","Ça part en couille là","T'es chaud toi","Ratio","Clip ça vite","Sah c'est bien","Grave","C'est ouf","Tu gères grave","C'est validé","J'avoue c'est propre","Tranquille tranquille","C'est chill","Mood","Big up","Ça fait plaiz","T'assures","C'est lourd"],
+            troll_light: ["On dirait un vrai live haha","Le cadrage est serré non ?","Je bug ou ça lag un peu ?","Qui a invité le bot ?","Le cadrage est chelou là","Ok mais pourquoi personne dit rien","Je crois que ton chat a buggé","C'est moi ou ça fige un peu ?","Tout le monde dort ou quoi","C'est calme calme calme"]
+        };
+
+        const prefixList = ["Alex", "Sara", "Tom", "Léna", "Max", "Lili", "Hugo", "Chloé", "Nico", "Emma"];
+        const rootList = ["_Gamer", "Vibes", "📸", "prod", "_off", ".xyz", "Design", "Fnx"];
+        const avatarColors = ["#ff2d55", "#4cd964", "#5856d6", "#ff9500", "#ffcc00", "#5ac8fa", "#007aff", "#e056fd", "#2a9d8f"];
+
         const video = document.getElementById('liveVideo');
-        const switchBtn = document.getElementById('switchCameraBtn');
-        const likeBtn = document.getElementById('sendLikeBtn');
         const chatDiv = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendMsgBtn');
         const viewerSpan = document.getElementById('viewerCount');
         const likeDisplaySpan = document.getElementById('likeCountDisplay');
         const totalLikesSpan = document.getElementById('totalLikesRealtime');
-        const startOverlay = document.getElementById('appStartOverlay');
-        const explicitStartBtn = document.getElementById('explicitStartBtn');
-        const heartStreamContainer = document.getElementById('heartStream');
         
-        let currentStream = null, currentFacing = 'user', cameraActive = false, isSwitching = false;
-        let totalLikes = 342, viewerCount = 187;
-        let mainLoopInterval = null, viewerInterval = null;
+        let totalLikes = 254, viewerCount = 142, currentStream = null, currentFacing = 'user';
 
-        // Base de données pour générer des profils variés
-        const randomUsers = [
-            {n: "Lili_Rose", c: "#ff2d55", v: true}, {n: "Max_Gamer", c: "#4cd964", v: false},
-            {n: "Sophia✨", c: "#5856d6", v: true}, {n: "Alex_Drone", c: "#ff9500", v: false},
-            {n: "Julie_B", c: "#ffcc00", v: false}, {n: "Lucas_Vibes", c: "#5ac8fa", v: false},
-            {n: "Thomas_📸", c: "#007aff", c:"#ff3b30", v: true}, {n: "Emma.Design", c: "#e056fd", v: false}
-        ];
-        
-        const randomComments = [
-            "Génial ce live ! 🔥", "Tu utilises quel téléphone ?", "Incroyable l'effet !", 
-            "Hello depuis Paris ! 👋", "Trop hâte de voir la suite", "Est-ce que ça marche bien ?", 
-            "Top ambiance !! 🎉", "Wow 😍", "Super fluide !", "Je kiffe trop !"
-        ];
-
-        const avatarColors = ["#ff2d55", "#4cd964", "#5856d6", "#ff9500", "#ffcc00", "#5ac8fa", "#007aff", "#e056fd", "#2a9d8f"];
-
-        function requestFullscreenMode(element) {
-            if (element.requestFullscreen) element.requestFullscreen();
-            else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+        function generateUniqueUsername() {
+            const p = prefixList[Math.floor(Math.random() * prefixList.length)];
+            const r = rootList[Math.floor(Math.random() * rootList.length)];
+            const num = Math.random() > 0.4 ? Math.floor(Math.random() * 98 + 2) : "";
+            return `${p}${r}${num}`;
         }
 
-        // Système de création graphique de tchat réaliste
-        function appendMessage(username, text, type = 'user', customColor = '#ff9f4a', verified = false) {
+        function appendMessage(username, text, type) {
             if (type === 'join') {
                 const joinDiv = document.createElement('div');
-                joinDiv.className = 'join-message fadeSlideUp';
-                joinDiv.innerHTML = `<i class="fas fa-user-plus"></i> <span><strong>${username}</strong> a rejoint le live</span>`;
+                joinDiv.className = 'join-message';
+                joinDiv.innerHTML = `<i class="fas fa-user-plus"></i> <span><strong>${username}</strong> a rejoint</span>`;
                 chatDiv.appendChild(joinDiv);
             } else {
                 const msgItem = document.createElement('div');
-                msgItem.className = `message-item ${type === 'system' ? 'system-message' : ''} ${type === 'my' ? 'my-message' : ''}`;
+                msgItem.className = `message-item ${type === 'my' ? 'my-message' : ''}`;
+                
+                // Association des couleurs de bordure conformes à votre architecture Flutter
+                let borderColor = '#ffffff';
+                if (type === 'question') borderColor = '#ffb300';
+                else if (type === 'hype') borderColor = '#ff2d55';
+                else if (type === 'slang' || type === 'troll_light') borderColor = '#ff9500';
+
+                msgItem.style.borderLeftColor = borderColor;
                 
                 const initials = username.substring(0, 2);
-                const avatarBg = type === 'system' ? '#ff3b30' : (type === 'my' ? '#2a9d8f' : customColor);
-                
-                let verifiedBadge = verified ? `<i class="fas fa-check-circle badge-verified" title="Compte Certifié"></i>` : '';
-                
+                const color = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+                const isVerified = Math.random() < 0.15;
+
                 msgItem.innerHTML = `
-                    <div class="avatar" style="background:${avatarBg}">${initials}</div>
+                    <div class="avatar" style="background:${color}">${initials}</div>
                     <div class="msg-content">
-                        <span class="username-wrapper" style="color:${avatarBg}">${username} ${verifiedBadge}</span>
+                        <span class="username-wrapper" style="color:${color}">${username} ${isVerified ? '<i class="fas fa-check-circle badge-verified"></i>' : ''}</span>
                         <span class="msg-text">${text}</span>
                     </div>
                 `;
                 chatDiv.appendChild(msgItem);
             }
-            
             chatDiv.scrollTop = chatDiv.scrollHeight;
-            
-            // Nettoyage rigoureux de la mémoire DOM (Limite à 50 éléments visibles)
-            while (chatDiv.children.length > 50) {
-                chatDiv.removeChild(chatDiv.firstChild);
-            }
+            while (chatDiv.children.length > 40) chatDiv.removeChild(chatDiv.firstChild);
         }
 
-        // Générateur de cœurs flottants réalistes à la TikTok
         function triggerFloatingHeart() {
             const heart = document.createElement('div');
             heart.className = 'floating-heart';
-            
-            // Propriétés graphiques aléatoires
-            const heartColors = ['#ff2d55', '#ff4757', '#ff6b81', '#ff4757', '#e056fd', '#ff9f4a'];
-            const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-            const randomSize = Math.floor(Math.random() * 10) + 18; // 18px à 28px
-            const randomXEnd = Math.floor(Math.random() * 80) - 40; // Dérive latérale -40px à +40px
-            
-            heart.style.color = randomColor;
-            heart.style.fontSize = `${randomSize}px`;
+            const randomXEnd = Math.floor(Math.random() * 60) - 30;
+            heart.style.color = ['#ff2d55', '#ff4757', '#e056fd', '#ff9f4a'][Math.floor(Math.random() * 4)];
             heart.style.setProperty('--x-end', `${randomXEnd}px`);
             heart.innerHTML = '<i class="fas fa-heart"></i>';
-            
-            heartStreamContainer.appendChild(heart);
-            
-            // Suppression définitive immédiate de la mémoire après l'animation
-            setTimeout(() => { heart.remove(); }, 2200);
+            document.getElementById('heartStream').appendChild(heart);
+            setTimeout(() => heart.remove(), 2200);
         }
 
-        function updateLikesUI() {
+        // Moteur de distribution rigoureux basé sur votre matrice de probabilités
+        function runSimulationTick() {
+            const dice = Math.random();
+            const user = generateUniqueUsername();
+
+            if (dice < 0.15) {
+                appendMessage(user, "", 'join');
+            } else {
+                let category = 'common';
+                const typeDice = Math.random();
+                
+                // Représentation équilibrée des 6 canaux de contenu
+                if (typeDice < 0.35) category = 'common';
+                else if (typeDice < 0.55) category = 'hype';
+                else if (typeDice < 0.70) category = 'questions';
+                else if (typeDice < 0.82) category = 'slang';
+                else if (typeDice < 0.92) category = 'offtopic_life';
+                else category = 'troll_light';
+
+                const pool = commentsDb[category];
+                const text = pool[Math.floor(Math.random() * pool.length)];
+                appendMessage(user, text, category);
+
+                if (category === 'hype' || Math.random() < 0.3) {
+                    totalLikes += Math.floor(Math.random() * 2) + 1;
+                    likeDisplaySpan.innerText = totalLikes;
+                    totalLikesSpan.innerText = totalLikes;
+                    triggerFloatingHeart();
+                }
+            }
+        }
+
+        async function initCamera(facing) {
+            if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
+                video.srcObject = currentStream;
+            } catch (e) {
+                console.warn("Caméra indisponible ou refusée.");
+            }
+        }
+
+        document.getElementById('explicitStartBtn').addEventListener('click', async () => {
+            document.getElementById('appStartOverlay').remove();
+            await initCamera('user');
+            setInterval(runSimulationTick, 2400);
+            setInterval(() => {
+                viewerCount += Math.floor(Math.random() * 5) - 2;
+                viewerSpan.innerText = Math.max(10, viewerCount);
+            }, 8000);
+        });
+
+        document.getElementById('switchCameraBtn').addEventListener('click', async () => {
+            currentFacing = currentFacing === 'user' ? 'environment' : 'user';
+            await initCamera(currentFacing);
+        });
+
+        document.getElementById('sendLikeBtn').addEventListener('click', () => {
+            totalLikes++;
             likeDisplaySpan.innerText = totalLikes;
             totalLikesSpan.innerText = totalLikes;
-        }
+            triggerFloatingHeart();
+        });
 
-        function addLikes(amount = 1, animate = true) {
-            totalLikes += amount;
-            updateLikesUI();
-            if (animate) triggerFloatingHeart();
-        }
+        document.getElementById('sendMsgBtn').addEventListener('click', executeUserMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeUserMessage(); });
 
-        // Moteur comportemental d'audience dynamique
-        function processAudienceSimulation() {
-            const dice = Math.random();
-            if (dice < 0.25) {
-                // Un spectateur rejoint le live
-                const randName = "User_" + Math.floor(Math.random() * 900 + 100);
-                appendMessage(randName, "", 'join');
-            } else if (dice < 0.65) {
-                // Un spectateur commente
-                const user = randomUsers[Math.floor(Math.random() * randomUsers.length)];
-                const text = randomComments[Math.floor(Math.random() * randomComments.length)];
-                appendMessage(user.n, text, 'user', user.c, user.v);
-                if (Math.random() < 0.4) addLikes(1, true);
-            } else {
-                // Vague de likes spontanés
-                const burst = Math.floor(Math.random() * 3) + 1;
-                for (let i = 0; i < burst; i++) {
-                    setTimeout(() => addLikes(1, true), i * 150);
-                }
-            }
-        }
-
-        function updateViewers() {
-            const change = Math.floor(Math.random() * 9) - 3; // Fluctuations réalistes (-3 à +5)
-            viewerCount = Math.max(25, viewerCount + change);
-            viewerSpan.innerText = viewerCount;
-        }
-
-        async function stopAndCleanStream() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => { if (track.readyState === 'live') track.stop(); });
-                currentStream = null;
-            }
-            video.srcObject = null;
-        }
-
-        async function initCamera(facingMode) {
-            if (isSwitching) return false;
-            isSwitching = true;
-            await stopAndCleanStream();
-            try {
-                let stream;
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: facingMode } }, audio: false });
-                } catch (e) {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                }
-                if (stream) {
-                    currentStream = stream; video.srcObject = stream; cameraActive = true;
-                    const oldRetry = document.querySelector('.retry-camera');
-                    if (oldRetry) oldRetry.remove();
-                    isSwitching = false; return true;
-                }
-                throw new Error("Flux introuvable");
-            } catch (err) {
-                cameraActive = false;
-                appendMessage("Caméra", "Accès restreint. Vérifiez vos autorisations système.", 'system');
-                let retryBtn = document.querySelector('.retry-camera');
-                if (!retryBtn) {
-                    retryBtn = document.createElement('button');
-                    retryBtn.className = 'retry-camera';
-                    retryBtn.innerHTML = '<i class="fas fa-camera"></i> Relancer la caméra';
-                    retryBtn.onclick = async () => { retryBtn.remove(); await initCamera(currentFacing); };
-                    video.parentElement.appendChild(retryBtn);
-                }
-                isSwitching = false; return false;
-            }
-        }
-
-        async function toggleCamera() {
-            if (isSwitching) return;
-            currentFacing = currentFacing === 'user' ? 'environment' : 'user';
-            const success = await initCamera(currentFacing);
-            if (success) {
-                appendMessage("Flux", currentFacing === 'environment' ? "Caméra environnementale active" : "Capteur frontal actif", 'system');
-            }
-        }
-
-        function userLikeAction() {
-            addLikes(1, true);
-            appendMessage("Vous", "A aimé votre propre direct", 'my');
-        }
-
-        function handleUserMessage() {
-            const text = chatInput.value.trim();
-            if (text === "") return;
-            appendMessage("Vous", text, 'my');
+        function executeUserMessage() {
+            const txt = chatInput.value.trim();
+            if(!txt) return;
+            appendMessage("Vous", txt, 'my');
             chatInput.value = "";
-            
-            // Réaction de la foule : l'envoi d'un message excite temporairement l'audience
-            setTimeout(() => {
-                addLikes(2, true);
-                const fastAnswers = ["Trop vrai !", "Haha grave", "Totalement d'accord 👌"];
-                appendMessage(randomUsers[0].n, fastAnswers[Math.floor(Math.random() * fastAnswers.length)], 'user', randomUsers[0].c, randomUsers[0].v);
-            }, 1200);
         }
-
-        video.addEventListener('dblclick', (e) => { e.preventDefault(); userLikeAction(); });
-        
-        explicitStartBtn.addEventListener('click', async () => {
-            requestFullscreenMode(document.documentElement);
-            
-            updateLikesUI();
-            viewerSpan.innerText = viewerCount;
-            
-            // Boucle principale adaptative (toutes les 2.8 secondes max)
-            mainLoopInterval = setInterval(processAudienceSimulation, 2800);
-            viewerInterval = setInterval(updateViewers, 9000);
-            
-            await initCamera('user');
-            
-            startOverlay.style.opacity = '0';
-            setTimeout(() => startOverlay.remove(), 400);
-        });
-
-        switchBtn.addEventListener('click', toggleCamera);
-        likeBtn.addEventListener('click', userLikeAction);
-        sendBtn.addEventListener('click', handleUserMessage);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUserMessage(); });
-
-        window.addEventListener('beforeunload', () => {
-            if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-            clearInterval(mainLoopInterval);
-            clearInterval(viewerInterval);
-        });
     })();
 </script>
 </body>
